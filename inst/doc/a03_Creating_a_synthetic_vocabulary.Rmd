@@ -1,0 +1,25 @@
+---
+title: "Creating a synthetic vocabulary"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{a03_Creating_a_synthetic_vocabulary}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(omock)
+```
+
+Here we explain creating a synthetic vocab table
+
+
+
+<span style="font-size:50px;">This function is currently under construction, a donation of high quality coffee to the OXINFER team would potential speed this up.</span>
