@@ -12,13 +12,14 @@
 #' @examples
 #' \donttest{
 #' library(omock)
-#' cdm <- mockCdmReference() |>
-#'   mockPerson(n = 100,
-#'              birthRange = as.Date(c("1930-01-01", "2022-01-01"))
-#'   )
+#' cdm <- mockPerson(cdm = mockCdmReference(),nPerson = 10)
+#'
+#' cdm$person
+#'
+#'
 #'}
 #'
-mockPerson <- function(cdm,
+mockPerson <- function(cdm = mockCdmReference(),
                        nPerson = 10,
                        birthRange = as.Date(c("1950-01-01", "2000-12-31")),
                        proportionFemale = 0.5,
@@ -53,9 +54,9 @@ mockPerson <- function(cdm,
     person = dplyr::tibble(
       person_id = person_id,
       gender_concept_id = gender,
-      year_of_birth = as.character(lubridate::year(dob)),
-      month_of_birth = as.character(lubridate::month(dob)),
-      day_of_birth = as.character(lubridate::day(dob))
+      year_of_birth = as.numeric(lubridate::year(dob)),
+      month_of_birth = as.numeric(lubridate::month(dob)),
+      day_of_birth = as.numeric(lubridate::day(dob))
     )
     person <- person |>
       dplyr::mutate(race_concept_id = NA,

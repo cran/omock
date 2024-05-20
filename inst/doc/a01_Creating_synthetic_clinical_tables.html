@@ -14,26 +14,38 @@
 
 <title>Creating synthetic clinical tables</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
@@ -51,55 +63,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -133,7 +144,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -149,56 +340,61 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<p>The omock package provides functionality to quickly create a cdm reference containing synthetic data based on population settings specified by the user.</p>
+<p>The omock package provides functionality to quickly create a cdm
+reference containing synthetic data based on population settings
+specified by the user.</p>
 <p>First, let’s load packages required for this vignette.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(omock)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
-<p>Now, in three lines of code, we can create a cdm reference with a person and observation period table for 1000 people.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">emptyCdmReference</span>(<span class="at">cdmName =</span> <span class="st">&quot;synthetic cdm&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mockPerson</span>(<span class="at">nPerson =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mockObservationPeriod</span>()</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>cdm</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── # OMOP CDM reference (local) of synthetic cdm ───────────────────────────────</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • omop tables: person, observation_period</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • cohort tables: -</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • achilles tables: -</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • other tables: -</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>cdm<span class="sc">$</span>person <span class="sc">%&gt;%</span> <span class="fu">glimpse</span>()</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Rows: 1,000</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Columns: 7</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ person_id            &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15…</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ gender_concept_id    &lt;dbl&gt; 8507, 8532, 8532, 8532, 8507, 8507, 8532, 8532, 8…</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ year_of_birth        &lt;chr&gt; &quot;1997&quot;, &quot;1963&quot;, &quot;1986&quot;, &quot;1978&quot;, &quot;1973&quot;, &quot;1961&quot;, &quot;…</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ month_of_birth       &lt;chr&gt; &quot;8&quot;, &quot;1&quot;, &quot;3&quot;, &quot;11&quot;, &quot;3&quot;, &quot;2&quot;, &quot;12&quot;, &quot;9&quot;, &quot;7&quot;, &quot;6…</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ day_of_birth         &lt;chr&gt; &quot;22&quot;, &quot;27&quot;, &quot;10&quot;, &quot;8&quot;, &quot;2&quot;, &quot;1&quot;, &quot;16&quot;, &quot;5&quot;, &quot;23&quot;,…</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ race_concept_id      &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ ethnicity_concept_id &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>cdm<span class="sc">$</span>observation_period <span class="sc">%&gt;%</span> <span class="fu">glimpse</span>()</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Rows: 1,000</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Columns: 5</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ observation_period_id         &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1…</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ person_id                     &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1…</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ observation_period_start_date &lt;date&gt; 2000-06-03, 1999-04-05, 2015-01-15, 198…</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ observation_period_end_date   &lt;date&gt; 2013-06-29, 2003-06-15, 2015-10-11, 201…</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ period_type_concept_id        &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</span></span></code></pre></div>
-<p>We can add further requirements around the population we create. For example we can require that they were born between 1960 and 1980 like so.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">emptyCdmReference</span>(<span class="at">cdmName =</span> <span class="st">&quot;synthetic cdm&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mockPerson</span>(<span class="at">nPerson =</span> <span class="dv">1000</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">birthRange =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">&quot;1960-01-01&quot;</span>, <span class="st">&quot;1980-12-31&quot;</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mockObservationPeriod</span>()</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>cdm<span class="sc">$</span>person <span class="sc">%&gt;%</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="fu">as.integer</span>(year_of_birth)), </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Year of birth&quot;</span>)</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(omock)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div>
+<p>Now, in three lines of code, we can create a cdm reference with a
+person and observation period table for 1000 people.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">emptyCdmReference</span>(<span class="at">cdmName =</span> <span class="st">&quot;synthetic cdm&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">mockPerson</span>(<span class="at">nPerson =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="fu">mockObservationPeriod</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>cdm</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; ── # OMOP CDM reference (local) of synthetic cdm ───────────────────────────────</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; • omop tables: person, observation_period</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; • cohort tables: -</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; • achilles tables: -</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; • other tables: -</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>cdm<span class="sc">$</span>person <span class="sc">%&gt;%</span> <span class="fu">glimpse</span>()</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; Rows: 1,000</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; Columns: 7</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; $ person_id            &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15…</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; $ gender_concept_id    &lt;dbl&gt; 8507, 8532, 8532, 8532, 8507, 8507, 8532, 8532, 8…</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; $ year_of_birth        &lt;dbl&gt; 1997, 1963, 1986, 1978, 1973, 1961, 1986, 1981, 1…</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; $ month_of_birth       &lt;dbl&gt; 8, 1, 3, 11, 3, 2, 12, 9, 7, 6, 1, 10, 1, 3, 7, 1…</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; $ day_of_birth         &lt;dbl&gt; 22, 27, 10, 8, 2, 1, 16, 5, 23, 2, 17, 13, 24, 20…</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; $ race_concept_id      &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; $ ethnicity_concept_id &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>cdm<span class="sc">$</span>observation_period <span class="sc">%&gt;%</span> <span class="fu">glimpse</span>()</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; Rows: 1,000</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt; Columns: 5</span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; $ observation_period_id         &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1…</span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt; $ person_id                     &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1…</span></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt; $ observation_period_start_date &lt;date&gt; 2000-06-03, 1999-04-05, 2015-01-15, 198…</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt; $ observation_period_end_date   &lt;date&gt; 2013-06-29, 2003-06-15, 2015-10-11, 201…</span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt; $ period_type_concept_id        &lt;lgl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</span></span></code></pre></div>
+<p>We can add further requirements around the population we create. For
+example we can require that they were born between 1960 and 1980 like
+so.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">emptyCdmReference</span>(<span class="at">cdmName =</span> <span class="st">&quot;synthetic cdm&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="fu">mockPerson</span>(<span class="at">nPerson =</span> <span class="dv">1000</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>             <span class="at">birthRange =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">&quot;1960-01-01&quot;</span>, <span class="st">&quot;1980-12-31&quot;</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">mockObservationPeriod</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>cdm<span class="sc">$</span>person <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="fu">as.integer</span>(year_of_birth)), </span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>                 <span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">colour =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Year of birth&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 
 
 

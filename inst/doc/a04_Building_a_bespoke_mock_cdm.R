@@ -27,7 +27,7 @@ cohortTables <- list(
 )
 
 # Create a mock CDM object from the user-defined tables
-cdm <- mockCdmReference() |> mockCdmFromTable(cohortTable = cohortTables)
+cdm <- mockCdmReference() |> mockCdmFromTables(tables = cohortTables)
 
 cdm |> glimpse()
 

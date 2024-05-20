@@ -5,7 +5,7 @@
 \title{mockPerson}
 \usage{
 mockPerson(
-  cdm,
+  cdm = mockCdmReference(),
   nPerson = 10,
   birthRange = as.Date(c("1950-01-01", "2000-12-31")),
   proportionFemale = 0.5,
@@ -32,10 +32,11 @@ mockPerson
 \examples{
 \donttest{
 library(omock)
-cdm <- mockCdmReference() |>
-  mockPerson(n = 100,
-             birthRange = as.Date(c("1930-01-01", "2022-01-01"))
-  )
+cdm <- mockPerson(cdm = mockCdmReference(),nPerson = 10)
+
+cdm$person
+
+
 }
 
 }

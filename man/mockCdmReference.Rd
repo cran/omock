@@ -4,10 +4,12 @@
 \alias{mockCdmReference}
 \title{Function to create empty cdm reference for mock database}
 \usage{
-mockCdmReference(cdmName = "mock database")
+mockCdmReference(cdmName = "mock database", vocabularySet = "mock")
 }
 \arguments{
 \item{cdmName}{name of the mock cdm object}
+
+\item{vocabularySet}{name of the vocabulary set}
 }
 \value{
 an empty cdm object
@@ -16,11 +18,10 @@ an empty cdm object
 Function to create empty cdm reference for mock database
 }
 \examples{
-\donttest{
 library(omock)
+
 cdm <- mockCdmReference()
 
 cdm
 
-}
 }
