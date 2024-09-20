@@ -1,29 +1,22 @@
-# check cohortTable
-# checkCohortTable <- function(cohortTable, call = parent.frame()) {
-#   assertTibble(
-#     cohortTable,
-#     columns = c(
-#       "cohort_definition_id", "subject_id", "cohort_start_date",
-#       "cohort_end_date"
-#     ),
-#     call = call
-#   )
-# }
 
 # check cohortSetTable
 checkCohortSetTable <- function(cohortSetTable, call = parent.frame()) {
-  assertTibble(
+
+  omopgenerics::assertTable(
     cohortSetTable,
+    class = "data.frame",
     columns = c("cohort_definition_id", "cohort_name"),
     null = TRUE,
     call = call
   )
+
 }
 
 # check cohortAttritionTable
 checkCohortAttritionTable <- function(cohortAttritionTable, call = parent.frame()) {
-  assertTibble(
+  omopgenerics::assertTable(
     cohortAttritionTable,
+    class = "data.frame",
     columns = c(
       "cohort_definition_id", "reason_id", "reason", "number_records",
       "number_subjects", "excluded_records", "excluded_subjects"
@@ -31,12 +24,16 @@ checkCohortAttritionTable <- function(cohortAttritionTable, call = parent.frame(
     null = TRUE,
     call = call
   )
+
+
 }
 
 # check cohortCountTable
 checkCohortCountTable <- function(cohortCountTable, call = parent.frame()) {
-  assertTibble(
+
+  omopgenerics::assertTable(
     cohortCountTable,
+    class = "data.frame",
     columns = c("cohort_definition_id", "number_records", "number_subjects"),
     null = TRUE,
     call = call
@@ -80,9 +77,16 @@ checkIndividuals <- function(individuals, person, call = parent.frame()) {
       "observation_end"
     )
     if (is.numeric(individuals)) {
-      assertNumeric(x = individuals, integerish = TRUE, length = 1, call = call)
+
+      omopgenerics::assertNumeric(
+        x = individuals, integerish = TRUE, length = 1, call = call)
+
     } else if ("tbl" %in% class(individuals)) {
-      assertTibble(individuals, columns = columns, call = call)
+      omopgenerics::assertTable(
+        individuals,
+        class = "data.frame",
+        call = call
+      )
     } else {
       cli::cli_abort(
         "individuals must be a numeric or a tbl element",
@@ -99,12 +103,20 @@ checkIndividuals <- function(individuals, person, call = parent.frame()) {
 
 # check seed
 checkSeed <- function(seed, call = parent.frame()) {
-  assertNumeric(seed, integerish = TRUE, min = 1, length = 1, call = call)
+  omopgenerics::assertNumeric(
+    seed,
+    integerish = TRUE,
+    min = 1,
+    length = 1,
+    null = TRUE,
+    call = call
+  )
 }
 
 # check numberRecords
 checkNumberRecords <- function(numberRecords, call = parent.frame()) {
-  assertNumeric(numberRecords, min = 0, named = TRUE, call = call)
+  omopgenerics::assertNumeric(
+    numberRecords, min = 0, named = TRUE, call = call)
   nam <- c(
     "death", "observationPeriod", "conditionOccurrence", "drugExposure",
     "procedureOccurrence", "deviceExposure", "measurement", "observation"
@@ -129,89 +141,100 @@ checkCdm <- function(cdm, tables = NULL, call = parent.env()) {
     cl <- cl[cl != "cdm_source"]
     cli::cli_abort(
       "The cdm_reference has to be a local cdm_reference, it can not be a:
-      `{cl}` source.", call = call
+      `{cl}` source.",
+      call = call
     )
   }
   if (!is.null(tables)) {
     tables <- tables[!(tables %in% names(cdm))]
     if (length(tables) > 0) {
       cli::cli_abort(
-        "tables: {tables} {?is/are} not present in the cdm object", call = call
+        "tables: {tables} {?is/are} not present in the cdm object",
+        call = call
       )
     }
   }
   invisible(NULL)
 }
 
-#check cdm cohort
+# check cdm cohort
 
 checkCohort <- function(string, call = parent.frame()) {
-  assertCharacter(string, na = TRUE, call = call)
+  omopgenerics::assertCharacter(string, na = TRUE, call = call)
 }
 
 # check nPerson
 checknPerson <- function(nPerson, call = parent.frame()) {
-  assertNumeric(nPerson, integerish = TRUE, min = 1, length = 1, call = call)
+  omopgenerics::assertNumeric(
+    nPerson, integerish = TRUE, min = 1, length = 1, call = call)
 }
 
 # check birthRange
 checkbirthRange <- function(birthRange, call = parent.frame()) {
-  assertDate(birthRange, length = 2, call = call)
+  omopgenerics::assertDate(birthRange, length = 2, call = call)
 
-  if(birthRange[1] >= birthRange[2]){
+  if (birthRange[1] >= birthRange[2]) {
     cli::cli_abort("max date must be greater than min date ", call = call)
   }
-
 }
 
-#check table name
+# check table name
 checktableName <- function(tableName, call = parent.frame()) {
-  assertCharacter(tableName, na = FALSE, call = call)
+  omopgenerics::assertCharacter(tableName, na = FALSE, call = call)
 }
 
 # check recordPerson
 checkrecordPerson <- function(recordPerson, call = parent.frame()) {
-  assertNumeric(recordPerson,
-                integerish = FALSE, length = NULL, min = 0.01, call = call)
-
+  omopgenerics::assertNumeric(recordPerson,
+    integerish = FALSE, length = NULL, min = 0.01, call = call
+  )
 }
 
 # check numberCohorts
 checknumberCohorts <- function(numberCohorts, call = parent.frame()) {
-  assertNumeric(numberCohorts,
-                integerish = TRUE,length = NULL, min = 1, call = call)
+  omopgenerics::assertNumeric(numberCohorts,
+    integerish = TRUE, length = NULL, min = 1, call = call
+  )
 }
 
-#check cohortName
+# check cohortName
 checkcohortName <- function(cohortName, call = parent.frame()) {
-  assertCharacter(cohortName, na = FALSE, call = call)
+  omopgenerics::assertCharacter(cohortName, na = FALSE, call = call)
 }
 
-#check cohort
+# check cohort
 checkcohort <- function(cohortName, call = parent.frame()) {
-  assertTibble(cohortName, null = FALSE, call = call)
+  omopgenerics::assertTable(
+    cohortName,
+    class = "data.frame",
+    null = FALSE,
+    call = call
+  )
 }
 
 # check genderSplit
 checkgenderSplit <- function(genderSplit, call = parent.frame()) {
-  assertNumeric(genderSplit,
-                integerish = FALSE,length = NULL, min = 0,max = 1, call = call)
+  omopgenerics::assertNumeric(genderSplit,
+    integerish = FALSE, length = NULL, min = 0, max = 1, call = call
+  )
 }
 
 # check list
 checkCohortTable <- function(cohortTable, call = parent.frame()) {
-  assertList(cohortTable,
-             length = NULL,
-             na = FALSE,
-             null = FALSE,
-             named = FALSE,
-             class = NULL,
-             call = parent.frame())
+  omopgenerics::assertList(cohortTable,
+    length = NULL,
+    na = FALSE,
+    null = FALSE,
+    named = FALSE,
+    class = NULL,
+    call = parent.frame()
+  )
 }
 
 # validate tables
 validateTables <- function(tables, call = parent.frame()) {
-  assertList(tables, class = "data.frame", named = TRUE, call = call)
+  omopgenerics::assertList(
+    tables, class = "data.frame", named = TRUE, call = call)
   # make sure they are tibbles
   tables <- purrr::map(tables, dplyr::as_tibble)
 
@@ -223,13 +246,15 @@ validateTables <- function(tables, call = parent.frame()) {
   return(tables)
 }
 
-#check concept set
-checkConceptSet<- function(conceptSet, call = parent.frame()) {
-  assertNumeric(conceptSet,
-                integerish = TRUE,length = NULL, min = 1, call = call)
+# check concept set
+checkConceptSet <- function(conceptSet, call = parent.frame()) {
+  omopgenerics::assertNumeric(conceptSet,
+    integerish = TRUE, length = NULL, min = 1, call = call
+  )
 }
 
 # check domain
 checkDomain <- function(domain, call = parent.frame()) {
-  assertCharacter(domain, na = FALSE, call = call)
+  omopgenerics::assertCharacter(domain, na = FALSE, call = call)
 }
+

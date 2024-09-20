@@ -1,4 +1,4 @@
-#' Generates a mock condition occurrence table and integrates it into an existing CDM object.
+#' Generates a mock procedure occurrence table and integrates it into an existing CDM object.
 #'
 #' This function simulates condition occurrences for individuals within a
 #' specified cohort. It helps create a realistic dataset by generating
@@ -9,7 +9,7 @@
 #'
 #' @param cdm A `cdm_reference` object that should already include 'person',
 #'           'observation_period', and 'concept' tables.This object is the base
-#'           CDM structure where the condition occurrence data will be added.
+#'           CDM structure where the procedure occurrence data will be added.
 #'            It is essential that these tables are not empty as they provide
 #'            the necessary context for generating condition data.
 #'
@@ -42,12 +42,12 @@
 #' cdm <- mockCdmReference() |>
 #'   mockPerson() |>
 #'   mockObservationPeriod() |>
-#'   mockConditionOccurrence(recordPerson = 2)
+#'   mockProcedureOccurrence(recordPerson = 2)
 #'
 #' # View the generated condition occurrence data
-#' print(cdm$condition_occurrence)
+#' print(cdm$procedure_occurrence)
 #' }
-mockConditionOccurrence <- function(cdm,
+mockProcedureOccurrence <- function(cdm,
                                     recordPerson = 1,
                                     seed = NULL) {
   checkInput(
@@ -59,7 +59,7 @@ mockConditionOccurrence <- function(cdm,
 
   # check if table are empty
   if (cdm$person |> nrow() == 0 ||
-    cdm$observation_period |> nrow() == 0 || is.null(cdm$concept)) {
+      cdm$observation_period |> nrow() == 0 || is.null(cdm$concept)) {
     cli::cli_abort(
       "person, observation_period and concept table cannot be empty")
   }
@@ -71,10 +71,15 @@ mockConditionOccurrence <- function(cdm,
 
   concept_id <-
     cdm$concept |>
-    dplyr::filter(.data$domain_id == "Condition") |>
+    dplyr::filter(.data$domain_id == "Procedure") |>
     dplyr::select("concept_id") |>
     dplyr::pull() |>
     unique()
+
+  if(length(concept_id) == 0){
+    cli::cli_abort(
+      "There are no Procedure in the concept table")
+  }
 
   # number of rows per concept_id
   numberRows <-
@@ -85,7 +90,7 @@ mockConditionOccurrence <- function(cdm,
   for (i in seq_along(concept_id)) {
     num <- numberRows
     con[[i]] <- dplyr::tibble(
-      condition_concept_id = concept_id[i],
+      procedure_concept_id = concept_id[i],
       subject_id = sample(
         x = cdm$person |> dplyr::pull("person_id"),
         size = num,
@@ -93,8 +98,8 @@ mockConditionOccurrence <- function(cdm,
       )
     ) |>
       addCohortDates(
-        start = "condition_start_date",
-        end = "condition_end_date",
+        start = "procedure_date",
+        end = "procedure_end_date",
         observationPeriod = cdm$observation_period
       )
   }
@@ -104,17 +109,17 @@ mockConditionOccurrence <- function(cdm,
     con |>
     dplyr::bind_rows() |>
     dplyr::mutate(
-      condition_occurrence_id = dplyr::row_number(),
-      condition_type_concept_id = 1
+      procedure_occurrence_id = dplyr::row_number(),
+      procedure_type_concept_id = 1
     ) |>
     dplyr::rename(person_id = "subject_id") |>
-    addOtherColumns(tableName = "condition_occurrence") |>
-    correctCdmFormat(tableName = "condition_occurrence")
+    addOtherColumns(tableName = "procedure_occurrence") |>
+    correctCdmFormat(tableName = "procedure_occurrence")
 
   cdm <-
     omopgenerics::insertTable(
       cdm = cdm,
-      name = "condition_occurrence",
+      name = "procedure_occurrence",
       table = con
     )
 

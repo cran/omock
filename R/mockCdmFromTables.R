@@ -1,14 +1,25 @@
-#' Creates a mock cdm_reference from a preexisting cdm_reference object (it can
-#' be empty) and a list of tables. It makes sure that all the observations are
-#' within observation and all individuals are present in person table.
+#' Generates a mock CDM (Common Data Model) object based on existing CDM structures and additional tables.
 #'
-#' @param cdm A cdm_reference object
-#' @param tables List of named tables. They can be either omop standard tables
-#' or cohort tables.
-#' @param seed An integer to fix the seed of random numbers. If NULL seed is not
-#' set.
+#' This function takes an existing CDM reference (which can be empty) and a list of additional named tables to create
+#' a more complete mock CDM object. It ensures that all provided observations fit within their respective observation
+#' periods and that all individual records are consistent with the entries in the person table. This is useful for
+#' creating reliable and realistic healthcare data simulations for development and testing within the OMOP CDM framework.
 #'
-#' @return a cdm object
+#' @param cdm A `cdm_reference` object, which serves as the base structure where all additional tables will be integrated.
+#'            This parameter should already be initialized and can contain pre-existing standard or cohort-specific OMOP tables.
+#'
+#' @param tables A named list of data frames representing additional tables to be integrated into the CDM.
+#'               These tables can include both standard OMOP tables such as 'drug_exposure' or 'condition_occurrence',
+#'               as well as cohort-specific tables that are not part of the standard OMOP model but are necessary for specific analyses.
+#'               Each table should be named according to its intended table name in the CDM structure.
+#'
+#' @param seed An optional integer that sets the seed for random number generation used in creating mock data entries.
+#'             Setting a seed ensures that the generated mock data are reproducible across different runs of the function.
+#'             If 'NULL', the seed is not set, leading to non-deterministic behavior in data generation.
+#'
+#' @return Returns the updated `cdm` object with all the new tables added and integrated, ensuring consistency
+#'         across the observational periods and the person entries.
+#'
 #' @export
 #'
 #' @examples
@@ -16,6 +27,7 @@
 #' library(omock)
 #' library(dplyr)
 #'
+#' # Create a mock cohort table
 #' cohort <- tibble(
 #'   cohort_definition_id = c(1, 1, 2, 2, 1, 3, 3, 3, 1, 3),
 #'   subject_id = c(1, 4, 2, 3, 5, 5, 4, 3, 3, 1),
@@ -26,28 +38,32 @@
 #'   cohort_end_date = cohort_start_date
 #' )
 #'
-#' cdm <- mockCdmFromTables(tables = list(cohort = cohort))
+#' # Generate a mock CDM from preexisting CDM structure and cohort table
+#' cdm <- mockCdmFromTables(cdm = mockCdmReference(), tables = list(cohort = cohort))
 #'
-#' cdm
-#' cdm$cohort
-#' cdm$person
-#'
-#'}
+#' # Access the newly integrated cohort table and the standard person table in the CDM
+#' print(cdm$cohort)
+#' print(cdm$person)
+#' }
 mockCdmFromTables <- function(cdm = mockCdmReference(),
                               tables = list(),
                               seed = NULL) {
-  meanBirthStart <- 5*365
-  meanStartFirst <- 2*365
-  meanLastEnd <- 1*365
+  meanBirthStart <- 5 * 365
+  meanStartFirst <- 2 * 365
+  meanLastEnd <- 1 * 365
 
   # initial checks
-  checkCdm(cdm)
-  assertNumeric(seed, integerish = TRUE, min = 1, length = 1, null = TRUE)
+  omopgenerics::validateCdmArgument(cdm = cdm)
+  omopgenerics::assertNumeric(seed,integerish = TRUE, min = 1,
+                              length = 1, null = TRUE)
+
   tables <- validateTables(tables)
 
   if (!is.null(seed)) set.seed(seed = seed)
 
-  if (length(tables) == 0) return(cdm)
+  if (length(tables) == 0) {
+    return(cdm)
+  }
 
   # append cdm tables to tables
   tables <- mergeTables(tables, cdm)
@@ -81,21 +97,20 @@ mockCdmFromTables <- function(cdm = mockCdmReference(),
   )
 
   return(cdm)
-
 }
 
 mergeTables <- function(tables, cdm, call = parent.frame()) {
   if (nrow(cdm$person) > 0) {
-    cli::cli_warn("!" = "person table will be overwritten", call = call)
+    cli::cli_warn(c("!" = "person table will be overwritten", call = call))
     cdm[["person"]] <- NULL
   }
   if (nrow(cdm$observation_period) > 0) {
-    cli::cli_warn("!" = "observation_period table will be overwritten", call = call)
+    cli::cli_warn(c("!" = "observation_period table will be overwritten", call = call))
     cdm[["observation_period"]] <- NULL
   }
   for (nm in names(cdm)) {
     if (nm %in% names(tables)) {
-      cli::cli_warn("!" = "{nm} table will be overwritten", call = call)
+      cli::cli_warn(c("!" = "{nm} table will be overwritten", call = call))
     } else {
       tables[[nm]] <- cdm[[nm]]
     }
@@ -136,7 +151,9 @@ getEthnicityConcepts <- function(cdm) {
 getLocations <- function(cdm) {
   x <- NULL
   if ("location" %in% names(cdm)) {
-    x <- cdm[["location"]] |> dplyr::pull("location_id") |> unique()
+    x <- cdm[["location"]] |>
+      dplyr::pull("location_id") |>
+      unique()
   }
   correctIds(x)
 }
@@ -228,14 +245,16 @@ summariseObservations <- function(tables) {
 }
 calculateDates <- function(individuals, meanBirthStart, meanStartFirst, meanLastEnd) {
   randomExp <- function(n, rate) {
-    stats::rexp(n = n, rate = rate) |> round() |> as.integer()
+    stats::rexp(n = n, rate = rate) |>
+      round() |>
+      as.integer()
   }
   n <- nrow(individuals)
   individuals |>
     dplyr::mutate(
-      "birth_start" = randomExp(n = n, rate = 1/meanBirthStart),
-      "start_first" = randomExp(n = n, rate = 1/meanStartFirst),
-      "last_end" = randomExp(n = n, rate = 1/meanLastEnd)
+      "birth_start" = randomExp(n = n, rate = 1 / meanBirthStart),
+      "start_first" = randomExp(n = n, rate = 1 / meanStartFirst),
+      "last_end" = randomExp(n = n, rate = 1 / meanLastEnd)
     ) |>
     dplyr::mutate(
       "start_observation" = .data$first_observation - .data$start_first,

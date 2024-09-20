@@ -8,7 +8,6 @@ knitr::opts_chunk$set(
 library(omock)
 
 ## -----------------------------------------------------------------------------
-
 cdm <- mockCdmReference() |>
   mockPerson(nPerson = 100) |>
   mockObservationPeriod() |>
@@ -19,5 +18,4 @@ cdm <- mockCdmReference() |>
   )
 
 cdm
-
 

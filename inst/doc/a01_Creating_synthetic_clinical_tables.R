@@ -10,28 +10,31 @@ library(dplyr)
 library(ggplot2)
 
 ## -----------------------------------------------------------------------------
-cdm <- emptyCdmReference(cdmName = "synthetic cdm") %>% 
-  mockPerson(nPerson = 1000) %>% 
+cdm <- emptyCdmReference(cdmName = "synthetic cdm") |>
+  mockPerson(nPerson = 1000) |>
   mockObservationPeriod()
 
 cdm
 
-cdm$person %>% glimpse()
+cdm$person |> glimpse()
 
-cdm$observation_period %>% glimpse()
+cdm$observation_period |> glimpse()
 
 ## -----------------------------------------------------------------------------
-cdm <- emptyCdmReference(cdmName = "synthetic cdm") %>% 
-  mockPerson(nPerson = 1000,
-             birthRange = as.Date(c("1960-01-01", "1980-12-31"))) %>% 
+cdm <- emptyCdmReference(cdmName = "synthetic cdm") |>
+  mockPerson(
+    nPerson = 1000,
+    birthRange = as.Date(c("1960-01-01", "1980-12-31"))
+  ) |>
   mockObservationPeriod()
 
 ## -----------------------------------------------------------------------------
-cdm$person %>% 
-  collect() %>% 
+cdm$person |>
+  collect() |>
   ggplot() +
-  geom_histogram(aes(as.integer(year_of_birth)), 
-                 binwidth = 1, colour = "grey") +
-  theme_minimal() + 
+  geom_histogram(aes(as.integer(year_of_birth)),
+    binwidth = 1, colour = "grey"
+  ) +
+  theme_minimal() +
   xlab("Year of birth")
 

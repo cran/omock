@@ -1,4 +1,3 @@
-
 #' Check the input parameters in OMOP CDM Tools environment
 #'
 #' @param ... Named elements to check. The name will determine the check that is
@@ -16,7 +15,6 @@
 #' @examples
 #' \donttest{
 #' library(dplyr)
-#'
 #' }
 #'
 checkInput <- function(..., .options = list(), call = parent.frame()) {
@@ -36,12 +34,12 @@ checkInput <- function(..., .options = list(), call = parent.frame()) {
 
 config <- function(inputs, .options) {
   # check that inputs is a named list
-  if(!assertNamedList(inputs)) {
+  if (!assertNamedList(inputs)) {
     cli::cli_abort("Inputs must be named to know the check to be applied")
   }
 
   # check that .options is a named list
-  if(!assertNamedList(.options)) {
+  if (!assertNamedList(.options)) {
     cli::cli_abort(".options must be a named list")
   }
 
@@ -95,13 +93,14 @@ config <- function(inputs, .options) {
 }
 performChecks <- function(toCheck, inputs, call = call) {
   for (k in seq_len(nrow(toCheck))) {
-    x <- toCheck[k,]
+    x <- toCheck[k, ]
     nam <- ifelse(
       x$package == "omock", x$name, paste0(x$package, "::", x$name)
     )
     eval(parse(text = paste0(nam, "(", paste0(
       unlist(x$available_argument), " = inputs[[\"",
-      unlist(x$available_argument), "\"]]", collapse = ", "
+      unlist(x$available_argument), "\"]]",
+      collapse = ", "
     ), ", call = call)")))
   }
 }
@@ -133,10 +132,10 @@ getAvailableFunctions <- function() {
   packageName <- methods::getPackageName()
   if (packageName != ".GlobalEnv") {
     name <- getNamespaceExports(packageName)
-    functionsSourcePackage <- dplyr::tibble(package = packageName, name =  name)
+    functionsSourcePackage <- dplyr::tibble(package = packageName, name = name)
   } else {
     functionsSourcePackage <- dplyr::tibble(
-      package = character(), name =  character()
+      package = character(), name = character()
     )
   }
 
@@ -166,13 +165,13 @@ addArgument <- function(functions, exclude = character()) {
   functions |>
     dplyr::rowwise() |>
     dplyr::group_split() |>
-    lapply(function(x){
+    lapply(function(x) {
       nam <- ifelse(
         x$package == "omock", x$name, paste0(x$package, "::", x$name)
       )
       argument <- formals(eval(parse(text = nam)))
       argument <- argument[!names(argument) %in% exclude]
-      requiredArgument <- lapply(argument, function(x){
+      requiredArgument <- lapply(argument, function(x) {
         xx <- x
         missing(xx)
       })
@@ -184,4 +183,77 @@ addArgument <- function(functions, exclude = character()) {
         )
     }) |>
     dplyr::bind_rows()
+}
+
+
+#' Add other columns to omop cdm tables
+#'
+#' @noRd
+#'
+addOtherColumns <- function(table, tableName) {
+
+  colToAdd <-
+    base::setdiff(omopgenerics::omopColumns(tableName, onlyRequired = FALSE),
+                  colnames(table))
+
+  for (col in colToAdd) {
+    table[[col]] <- NA
+  }
+
+  return(table)
+
+}
+
+#' Format columns of omop table to correct format
+#'
+#' @noRd
+#'
+correctCdmFormat <- function(table, tableName) {
+  formatTable <- cdmTable |> dplyr::filter(.data$cdmTableName == tableName)
+
+  for (i in 1:nrow(formatTable)) {
+    colName <- formatTable$cdmFieldName[i]
+    colType <- formatTable$cdmDatatype[i]
+
+    if (colName %in% colnames(table)) {
+      if (colType == "integer") {
+        table[[colName]] <- as.integer(table[[colName]])
+      }
+
+      if (colType == "date") {
+        table[[colName]] <- as.Date(table[[colName]])
+
+      }
+
+      if (colType == "datetime") {
+        table[[colName]] <-
+          as.POSIXct(table[[colName]], format = "%Y-%m-%d %H:%M:%S")
+      }
+
+      if (colType == "float") {
+        table[[colName]] <- as.numeric(table[[colName]])
+      }
+
+      if (grepl("varchar", colType)) {
+        table[[colName]] <- as.character(table[[colName]])
+      }
+
+    }
+
+  }
+
+  return(table)
+
+
+}
+#' get column start date
+#'
+#' @noRd
+#'
+startDateColumn <- function(tableName) {
+  if (tableName %in% namesTable$table_name) {
+    return(namesTable$start_date_name[namesTable$table_name == tableName])
+  } else {
+    return("cohort_start_date")
+  }
 }
