@@ -2,7 +2,7 @@ Type: Package
 Package: omock
 Title: Creation of Mock Observational Medical Outcomes Partnership
         Common Data Model
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: c(
     person("Mike", "Du", , "mike.du@ndorms.ox.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9517-8834")),
@@ -33,11 +33,11 @@ Encoding: UTF-8
 RoxygenNote: 7.3.2
 BugReports: https://github.com/ohdsi/omock/issues
 NeedsCompilation: no
-Packaged: 2024-09-17 15:09:26 UTC; miked
+Packaged: 2024-10-15 11:40:46 UTC; miked
 Author: Mike Du [aut, cre] (<https://orcid.org/0000-0002-9517-8834>),
   Marti Catala [aut] (<https://orcid.org/0000-0003-3308-9905>),
   Edward Burn [aut] (<https://orcid.org/0000-0002-9286-1128>),
   Nuria Mercade-Besora [aut] (<https://orcid.org/0009-0006-7948-3747>),
   Xihang Chen [aut] (<https://orcid.org/0009-0001-8112-8959>)
 Repository: CRAN
-Date/Publication: 2024-09-20 09:50:02 UTC
+Date/Publication: 2024-10-15 13:30:02 UTC
