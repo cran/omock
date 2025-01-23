@@ -71,6 +71,12 @@ mockCdmFromTables <- function(cdm = mockCdmReference(),
   # summarise individuals observation
   individuals <- summariseObservations(tables)
 
+  if (max(individuals$last_observation) > as.Date("01-01-2024", "%d-%m-%Y")) {
+    cli::cli_abort("tables provided contain date greater than 01-01-2024",
+                   call = parent.frame())
+
+  }
+
   # get observation period times and birth dates
   dates <- calculateDates(individuals, meanBirthStart, meanStartFirst, meanLastEnd)
 
@@ -93,7 +99,6 @@ mockCdmFromTables <- function(cdm = mockCdmReference(),
   cohortTables <- tables[!names(tables) %in% omopgenerics::omopTables()]
   for (tables in names(cohortTables)){
     cohortTables[[tables]] <- cohortTables[[tables]] |>
-      addOtherColumns("cohort_definition") |>
       correctCdmFormat("cohort_definition") |>
       dplyr::mutate(subject_id = as.integer(.data$subject_id))
   }
@@ -249,7 +254,7 @@ summariseObservations <- function(tables) {
     )
   return(individuals)
 }
-calculateDates <- function(individuals, meanBirthStart, meanStartFirst, meanLastEnd) {
+calculateDates <- function(individuals, meanBirthStart, meanStartFirst, meanLastEnd, maxEnd = "01-01-2024") {
   randomExp <- function(n, rate) {
     stats::rexp(n = n, rate = rate) |>
       round() |>
@@ -263,10 +268,14 @@ calculateDates <- function(individuals, meanBirthStart, meanStartFirst, meanLast
       "last_end" = randomExp(n = n, rate = 1 / meanLastEnd)
     ) |>
     dplyr::mutate(
+      "max" = as.Date(maxEnd, "%d-%m-%Y"),
       "start_observation" = .data$first_observation - .data$start_first,
       "end_observation" = .data$last_observation + .data$last_end,
       "birth_date" = .data$start_observation - .data$birth_start
-    ) |>
+    ) |> dplyr::rowwise() |>
+    dplyr::mutate("start_observation" = min(.data$start_observation, .data$max),
+                  "end_observation" = min(.data$end_observation, .data$max)) |>
+    dplyr::ungroup() |>
     dplyr::select(
       "person_id", "birth_date", "start_observation", "end_observation"
     )
