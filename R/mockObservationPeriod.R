@@ -28,8 +28,12 @@
 mockObservationPeriod <- function(cdm,
                                   seed = NULL) {
   checkInput(cdm = cdm)
-  if (nrow(cdm$observation_period) == 0 &
-    nrow(cdm$person) != 0) {
+  if (nrow(cdm$person) != 0) {
+
+   if(nrow(cdm$observation_period) != 0) {
+     cli::cli_inform("The observation period table has been overwritten.")
+   }
+
     if (!is.null(seed)) {
       set.seed(seed = seed)
     }
@@ -50,18 +54,20 @@ mockObservationPeriod <- function(cdm,
         )
       )) |>
       dplyr::select(!c("year_of_birth1", "month_of_birth1", "day_of_birth1")) |>
-      dplyr::select(dob) |>
+      dplyr::select("dob") |>
       dplyr::pull()
 
 
     # generate observation date from dob
+
     observationDate <- obsDate(dob = dob, max = max(
       as.Date("2020-01-01"),
       max(as.Date(dob))
     ))
 
+
     person_id <- cdm$person |>
-      dplyr::select(person_id) |>
+      dplyr::select("person_id") |>
       dplyr::pull()
 
     # define observation period table
@@ -94,19 +100,11 @@ mockObservationPeriod <- function(cdm,
 
 # function to generate mock observational period date from a list of dob
 obsDate <- function(dob = dob, max = "2020-01-01") {
-  # Initialise vector for output
-  start <- rep(as.Date(NA), length(dob))
-  end <- rep(as.Date(NA), length(dob))
-  # generate obs start and end date
-  for (i in seq_along(dob)) {
-    start[i] <- sample(seq(as.Date(dob[i]), as.Date(max),
-      by =
-        "day"
-    ), 1)
-    end[i] <- sample(seq(as.Date(start[i]), as.Date(max),
-      by =
-        "day"
-    ), 1)
-  }
+  #
+  r1 <- stats::runif(n = length(dob))
+  start <- dob + floor((as.Date(max) - dob) * r1)
+  r2 <- stats::runif(n = length(dob))
+  end <- start + ceiling((as.Date(max) - start) * r2)
+
   list(start, end)
 }

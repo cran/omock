@@ -367,13 +367,9 @@ mockCdmFromTable() functions in a few lines of code.</p>
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a></span>
 <span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co"># Create a mock CDM object from the user-defined tables</span></span>
 <span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">mockCdmReference</span>() <span class="sc">|&gt;</span> <span class="fu">mockCdmFromTables</span>(<span class="at">tables =</span> cohortTables)</span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; ! cohort columns will be reordered to match the expected order:</span></span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt;   cohort_definition_id, subject_id, cohort_start_date, and cohort_end_date.</span></span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; ! cohort columns will be reordered to match the expected order:</span></span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt;   cohort_definition_id, subject_id, cohort_start_date, and cohort_end_date.</span></span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>cdm <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; A cdm reference of mock database with 11 tables: person, observation_period, cdm_source, concept, vocabulary, concept_relationship, concept_synonym, concept_ancestor, drug_strength, cohort1, and cohort2.</span></span></code></pre></div>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>cdm <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; A cdm reference of mock database with 11 tables: person, observation_period, cdm_source, concept, vocabulary, concept_relationship, concept_synonym, concept_ancestor, drug_strength, cohort1, and cohort2.</span></span></code></pre></div>
 
 
 
