@@ -12,7 +12,7 @@
 
 
 
-<title>Creating a synthetic vocabulary</title>
+<title>Creating synthetic vocabulary Tables with omock</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -336,15 +336,98 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Creating a synthetic vocabulary</h1>
+<h1 class="title toc-ignore">Creating synthetic vocabulary Tables with
+omock</h1>
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(omock)</span></code></pre></div>
-<p>Here we explain creating a synthetic vocab table</p>
-<p><span style="font-size:50px;">This function is currently under
-construction, a donation of high quality coffee to the OXINFER team
-would potential speed this up.</span></p>
+<p>The <code>omock</code> R package provides functions to build and
+populate mock or user’s bespoke vocabulary tables for their mock cdm.In
+this vignette, we’ll show how to use the
+<code>mockVocabularyTables()</code> function to initialize standard OMOP
+vocabulary tables within a mock CDM reference.</p>
+<p>First, let’s load packages required for this vignette.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(omock)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
+<p>Then we start off with creating an <code>cdm</code> object.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">emptyCdmReference</span>(<span class="at">cdmName =</span> <span class="st">&quot;synthetic cdm&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">mockPerson</span>(<span class="at">nPerson =</span> <span class="dv">10</span>, <span class="at">birthRange =</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">&quot;1960-01-01&quot;</span>, <span class="st">&quot;1980-12-31&quot;</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="fu">mockObservationPeriod</span>()</span></code></pre></div>
+<p>To populate this cdm object with synthetic vocabulary table, we
+simply use the <code>mockVocabularyTables()</code> function. The
+<code>omock</code> package comes with two set mock vocabulary tables at
+the moment. “mock” and “Eunomia”, the “mock” vocabulary set contain a
+very small subset of vocabularies from the CPRD database and “Eunomia”
+is the vocabulary set from the eunomia test database. <a href="https://ohdsi.github.io/Eunomia/" class="uri">https://ohdsi.github.io/Eunomia/</a>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">mockVocabularyTables</span>(cdm, <span class="at">vocabularySet =</span> <span class="st">&quot;mock&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>cdm<span class="sc">$</span>vocabulary <span class="sc">|&gt;</span> <span class="fu">print</span>()</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; # A tibble: 65 × 5</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt;    vocabulary_id        vocabulary_name  vocabulary_reference vocabulary_version</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt;  * &lt;chr&gt;                &lt;chr&gt;            &lt;chr&gt;                &lt;chr&gt;             </span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt;  1 ABMS                 Provider Specia… http://www.abms.org… mock              </span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt;  2 ATC                  WHO Anatomic Th… http://www.whocc.no… mock              </span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt;  3 CDM                  OMOP Common Dat… https://github.com/… mock              </span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt;  4 CMS Place of Service Place of Servic… http://www.cms.gov/… mock              </span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt;  5 Cohort Type          OMOP Cohort Type OMOP generated       mock              </span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt;  6 Concept Class        OMOP Concept Cl… OMOP generated       mock              </span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt;  7 Condition Status     OMOP Condition … OMOP generated       mock              </span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt;  8 Condition Type       OMOP Condition … OMOP generated       mock              </span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt;  9 Cost                 OMOP Cost        OMOP generated       mock              </span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; 10 Cost Type            OMOP Cost Type   OMOP generated       mock              </span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; # ℹ 55 more rows</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; # ℹ 1 more variable: vocabulary_concept_id &lt;int&gt;</span></span></code></pre></div>
+<p>set vocabularySet to eunomia to create the cdm with eunomia
+vocabulary table.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">mockVocabularyTables</span>(cdm, <span class="at">vocabularySet =</span> <span class="st">&quot;eunomia&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>cdm<span class="sc">$</span>vocabulary <span class="sc">|&gt;</span> <span class="fu">print</span>()</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; # A tibble: 125 × 5</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt;    vocabulary_id vocabulary_name         vocabulary_reference vocabulary_version</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt;  * &lt;chr&gt;         &lt;chr&gt;                   &lt;chr&gt;                &lt;chr&gt;             </span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt;  1 ABMS          Provider Specialty (Am… http://www.abms.org… 2018-06-26 ABMS   </span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt;  2 AMT           Australian Medicines T… https://www.nehta.g… AMT 01-SEP-17     </span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt;  3 APC           Ambulatory Payment Cla… http://www.cms.gov/… 2018-January-Adde…</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;  4 ATC           WHO Anatomic Therapeut… FDB UK distribution… RXNORM 2018-08-12 </span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt;  5 BDPM          Public Database of Med… http://base-donnees… BDPM 17-JUL-17    </span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;  6 CDM           OMOP Common DataModel   https://github.com/… CDM v6.0.0        </span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;  7 CDT           Current Dental Termino… http://www.nlm.nih.… 2018 Release      </span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt;  8 CIEL          Columbia International… https://wiki.openmr… Openmrs 1.11.0 20…</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt;  9 Cohort        Legacy OMOP HOI or DOI… OMOP generated       &lt;NA&gt;              </span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; 10 Cohort Type   OMOP Cohort Type        OMOP generated       &lt;NA&gt;              </span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; # ℹ 115 more rows</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; # ℹ 1 more variable: vocabulary_concept_id &lt;int&gt;</span></span></code></pre></div>
+<p>You can also edit any vocabulary table with your own bespoke
+vocabulary, for example if you want to insert your own bespoke concept
+table. you can do below.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>myConceptTable <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">concept_id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">concept_name =</span> <span class="fu">c</span>(<span class="st">&quot;Condition A&quot;</span>, <span class="st">&quot;Condition B&quot;</span>, <span class="st">&quot;Drug C&quot;</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">domain_id =</span> <span class="fu">c</span>(<span class="st">&quot;Condition&quot;</span>, <span class="st">&quot;Condition&quot;</span>, <span class="st">&quot;Drug&quot;</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">vocabulary_id =</span> <span class="fu">c</span>(<span class="st">&quot;SNOMED&quot;</span>, <span class="st">&quot;SNOMED&quot;</span>, <span class="st">&quot;RxNorm&quot;</span>),</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">concept_class_id =</span> <span class="fu">c</span>(<span class="st">&quot;Clinical Finding&quot;</span>, <span class="st">&quot;Clinical Finding&quot;</span>, <span class="st">&quot;Ingredient&quot;</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="at">standard_concept =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;S&quot;</span>, <span class="st">&quot;S&quot;</span>),</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="at">concept_code =</span> <span class="fu">c</span>(<span class="st">&quot;111&quot;</span>, <span class="st">&quot;222&quot;</span>, <span class="st">&quot;333&quot;</span>),</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="at">valid_start_date =</span> <span class="fu">as.Date</span>(<span class="st">&quot;1970-01-01&quot;</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="at">valid_end_date =</span> <span class="fu">as.Date</span>(<span class="st">&quot;2099-12-31&quot;</span>),</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  <span class="at">invalid_reason =</span> <span class="cn">NA</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>)</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">mockVocabularyTables</span>(cdm, </span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>                            <span class="at">vocabularySet =</span> <span class="st">&quot;eunomia&quot;</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>                            <span class="at">concept =</span> myConceptTable) </span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>cdm<span class="sc">$</span>concept <span class="sc">|&gt;</span> <span class="fu">print</span>()</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 10</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt;   concept_id concept_name domain_id vocabulary_id concept_class_id</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; *      &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;     &lt;chr&gt;         &lt;chr&gt;           </span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; 1          1 Condition A  Condition SNOMED        Clinical Finding</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; 2          2 Condition B  Condition SNOMED        Clinical Finding</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; 3          3 Drug C       Drug      RxNorm        Ingredient      </span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; # ℹ 5 more variables: standard_concept &lt;chr&gt;, concept_code &lt;chr&gt;,</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; #   valid_start_date &lt;date&gt;, valid_end_date &lt;date&gt;, invalid_reason &lt;lgl&gt;</span></span></code></pre></div>
+<p>As you can see mockVocabularyTables() allows you to populate a mock
+CDM with custom vocabulary tables, it provided two different vocabulary
+set for you to choose from and also give you the flexibility to modify
+it with your own custom vocabulary tables.</p>
 
 
 
