@@ -2,11 +2,11 @@ Type: Package
 Package: omock
 Title: Creation of Mock Observational Medical Outcomes Partnership
         Common Data Model
-Version: 0.5.0
+Version: 0.6.0
 Authors@R: c(
     person("Mike", "Du", , "mike.du@ndorms.ox.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9517-8834")),
-    person("Marti", "Catala", , "marti.catalasabate@ndorms.ox.ac.uk", role = "aut",
+    person("Martí", "Català", , "marti.catalasabate@ndorms.ox.ac.uk", role = "aut",
            comment = c(ORCID = "0000-0003-3308-9905")),
     person("Edward", "Burn", , "edward.burn@ndorms.ox.ac.uk", role = "aut",
            comment = c(ORCID = "0000-0002-9286-1128")),
@@ -24,23 +24,23 @@ Description: Creates mock data for testing and package development for the
 License: Apache License (>= 2)
 URL: https://ohdsi.github.io/omock/, https://github.com/ohdsi/omock
 Depends: R (>= 4.1.0)
-Imports: arrow, cli, dplyr, lifecycle, lubridate, methods, omopgenerics
-        (>= 0.3.0), purrr, readr, rlang, snakecase, stats
-Suggests: CDMConnector, DBI, duckdb, ggplot2, knitr, rmarkdown,
-        testthat (>= 3.0.0)
+Imports: arrow, cli, dplyr, lifecycle, clock, methods, omopgenerics (>=
+        1.3.1), purrr, readr, rlang, stats, utils
+Suggests: CDMConnector, DBI, duckdb, ggplot2, gt, knitr,
+        PatientProfiles, rmarkdown, stringr, testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 BugReports: https://github.com/ohdsi/omock/issues
 LazyData: true
 NeedsCompilation: no
-Packaged: 2025-09-01 16:42:59 UTC; miked
+Packaged: 2025-10-31 17:54:40 UTC; miked
 Author: Mike Du [aut, cre] (ORCID: <https://orcid.org/0000-0002-9517-8834>),
-  Marti Catala [aut] (ORCID: <https://orcid.org/0000-0003-3308-9905>),
+  Martí Català [aut] (ORCID: <https://orcid.org/0000-0003-3308-9905>),
   Edward Burn [aut] (ORCID: <https://orcid.org/0000-0002-9286-1128>),
   Nuria Mercade-Besora [aut] (ORCID:
     <https://orcid.org/0009-0006-7948-3747>),
   Xihang Chen [aut] (ORCID: <https://orcid.org/0009-0001-8112-8959>)
 Repository: CRAN
-Date/Publication: 2025-09-01 17:20:08 UTC
+Date/Publication: 2025-10-31 18:20:07 UTC

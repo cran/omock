@@ -32,6 +32,9 @@ reflecting the newly added concepts.The function directly modifies
 the provided CDM object.
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+}
+\details{
 This function inserts new concept entries into a specified domain within
 the concept table of a CDM object.It supports four domains: Condition, Drug,
 Measurement, and Observation. Existing entries with the same concept IDs
@@ -44,7 +47,8 @@ library(dplyr)
 
 # Create a mock CDM reference and add concepts in the 'Condition' domain
 cdm <- mockCdmReference() |> mockConcepts(
-conceptSet = c(100, 200), domain = "Condition")
+  conceptSet = c(100, 200), domain = "Condition"
+)
 
 # View the updated concept entries for the 'Condition' domain
 cdm$concept |> filter(domain_id == "Condition")

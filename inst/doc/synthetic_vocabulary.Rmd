@@ -2,7 +2,7 @@
 title: "Creating synthetic vocabulary Tables with omock"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{a03_Creating_a_synthetic_vocabulary}
+  %\VignetteIndexEntry{synthetic_vocabulary}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -58,9 +58,10 @@ myConceptTable <- data.frame(
   invalid_reason = NA
 )
 
-cdm <- mockVocabularyTables(cdm, 
-                            vocabularySet = "eunomia",
-                            concept = myConceptTable) 
+cdm <- mockVocabularyTables(cdm,
+  vocabularySet = "eunomia",
+  concept = myConceptTable
+)
 
 cdm$concept |> print()
 ```

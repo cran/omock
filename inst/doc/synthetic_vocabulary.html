@@ -411,19 +411,20 @@ table. you can do below.</p>
 <span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  <span class="at">invalid_reason =</span> <span class="cn">NA</span></span>
 <span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>)</span>
 <span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">mockVocabularyTables</span>(cdm, </span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>                            <span class="at">vocabularySet =</span> <span class="st">&quot;eunomia&quot;</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>                            <span class="at">concept =</span> myConceptTable) </span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a></span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>cdm<span class="sc">$</span>concept <span class="sc">|&gt;</span> <span class="fu">print</span>()</span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 10</span></span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt;   concept_id concept_name domain_id vocabulary_id concept_class_id</span></span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; *      &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;     &lt;chr&gt;         &lt;chr&gt;           </span></span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; 1          1 Condition A  Condition SNOMED        Clinical Finding</span></span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; 2          2 Condition B  Condition SNOMED        Clinical Finding</span></span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; 3          3 Drug C       Drug      RxNorm        Ingredient      </span></span>
-<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; # ℹ 5 more variables: standard_concept &lt;chr&gt;, concept_code &lt;chr&gt;,</span></span>
-<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; #   valid_start_date &lt;date&gt;, valid_end_date &lt;date&gt;, invalid_reason &lt;lgl&gt;</span></span></code></pre></div>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">mockVocabularyTables</span>(cdm,</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>  <span class="at">vocabularySet =</span> <span class="st">&quot;eunomia&quot;</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>  <span class="at">concept =</span> myConceptTable</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>)</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>cdm<span class="sc">$</span>concept <span class="sc">|&gt;</span> <span class="fu">print</span>()</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 10</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt;   concept_id concept_name domain_id vocabulary_id concept_class_id</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; *      &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;     &lt;chr&gt;         &lt;chr&gt;           </span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; 1          1 Condition A  Condition SNOMED        Clinical Finding</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; 2          2 Condition B  Condition SNOMED        Clinical Finding</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 3          3 Drug C       Drug      RxNorm        Ingredient      </span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; # ℹ 5 more variables: standard_concept &lt;chr&gt;, concept_code &lt;chr&gt;,</span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; #   valid_start_date &lt;date&gt;, valid_end_date &lt;date&gt;, invalid_reason &lt;chr&gt;</span></span></code></pre></div>
 <p>As you can see mockVocabularyTables() allows you to populate a mock
 CDM with custom vocabulary tables, it provided two different vocabulary
 set for you to choose from and also give you the flexibility to modify

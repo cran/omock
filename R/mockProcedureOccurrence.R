@@ -56,30 +56,29 @@ mockProcedureOccurrence <- function(cdm,
     seed = seed
   )
 
-
   # check if table are empty
   if (cdm$person |> nrow() == 0 ||
-      cdm$observation_period |> nrow() == 0 || is.null(cdm$concept)) {
+    cdm$observation_period |> nrow() == 0 || is.null(cdm$concept)) {
     cli::cli_abort(
-      "person, observation_period and concept table cannot be empty")
+      "person, observation_period and concept table cannot be empty"
+    )
   }
 
   if (!is.null(seed)) {
     set.seed(seed = seed)
   }
 
+  concept_id <- getConceptId(cdm = cdm, type = "Procedure")
+  type_id <- getConceptId(cdm = cdm, type = "Procedure Type")
 
-  concept_id <-
-    cdm$concept |>
-    dplyr::filter(.data$domain_id == "Procedure" &
-                    .data$standard_concept == "S") |>
-    dplyr::select("concept_id") |>
-    dplyr::pull() |>
-    unique()
+  if (length(type_id) == 0) {
+    type_id <- 0L
+  }
 
-  if(length(concept_id) == 0){
+  if (length(concept_id) == 0) {
     cli::cli_abort(
-      "There are no Procedure in the concept table")
+      "There are no Procedure in the concept table"
+    )
   }
 
   # number of rows per concept_id
@@ -106,23 +105,19 @@ mockProcedureOccurrence <- function(cdm,
   }
 
 
-  con <-
-    con |>
+  con <- con |>
     dplyr::bind_rows() |>
     dplyr::mutate(
       procedure_occurrence_id = dplyr::row_number(),
-      procedure_type_concept_id = 1
+      procedure_type_concept_id = if (length(type_id) > 1) {
+        sample(c(type_id), size = dplyr::n(), replace = TRUE)
+      } else {
+        type_id
+      }
     ) |>
     dplyr::rename(person_id = "subject_id") |>
     addOtherColumns(tableName = "procedure_occurrence") |>
     correctCdmFormat(tableName = "procedure_occurrence")
 
-  cdm <-
-    omopgenerics::insertTable(
-      cdm = cdm,
-      name = "procedure_occurrence",
-      table = con
-    )
-
-  return(cdm)
+  omopgenerics::insertTable(cdm = cdm, name = "procedure_occurrence", table = con)
 }

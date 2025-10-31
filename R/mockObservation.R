@@ -50,15 +50,12 @@ mockObservation <- function(cdm,
     cli::cli_abort("person and observation_period table cannot be empty")
   }
 
+  concept_id <- getConceptId(cdm = cdm, type = "Observation")
+  type_id <- getConceptId(cdm = cdm, type = "Observation Type")
 
-
-  concept_id <-
-    cdm$concept |>
-    dplyr::filter(.data$domain_id == "Observation" &
-                    .data$standard_concept == "S") |>
-    dplyr::select("concept_id") |>
-    dplyr::pull() |>
-    unique()
+  if (length(type_id) == 0) {
+    type_id <- 0L
+  }
 
   # concept count
   concept_count <- length(concept_id)
@@ -67,11 +64,11 @@ mockObservation <- function(cdm,
   numberRows <-
     recordPerson * (cdm$person |> dplyr::tally() |> dplyr::pull()) |> round()
 
-  observation <- list()
+  obs <- list()
 
   for (i in seq_along(concept_id)) {
     num <- numberRows
-    observation[[i]] <- dplyr::tibble(
+    obs[[i]] <- dplyr::tibble(
       observation_concept_id = concept_id[i],
       subject_id = sample(
         x = cdm$person |> dplyr::pull("person_id"),
@@ -86,13 +83,15 @@ mockObservation <- function(cdm,
       )
   }
 
-
-  observation <-
-    observation |>
+  obs <- obs |>
     dplyr::bind_rows() |>
     dplyr::mutate(
       observation_id = dplyr::row_number(),
-      observation_type_concept_id = 1
+      observation_type_concept_id = if (length(type_id) > 1) {
+        sample(c(type_id), size = dplyr::n(), replace = TRUE)
+      } else {
+        type_id
+      }
     ) |>
     dplyr::rename(
       person_id = "subject_id",
@@ -102,12 +101,5 @@ mockObservation <- function(cdm,
     addOtherColumns(tableName = "observation") |>
     correctCdmFormat(tableName = "observation")
 
-  cdm <-
-    omopgenerics::insertTable(
-      cdm = cdm,
-      name = "observation",
-      table = observation
-    )
-
-  return(cdm)
+  omopgenerics::insertTable(cdm = cdm, name = "observation", table = obs)
 }

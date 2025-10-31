@@ -1,4 +1,3 @@
-
 #' Create a `local` cdm_reference from a dataset.
 #'
 #' @param datasetName Name of the mock dataset. See `availableMockDatasets()`
@@ -30,7 +29,7 @@ mockCdmFromDataset <- function(datasetName = "GiBleed",
   # folder to unzip
   tmpFolder <- file.path(tempdir(), omopgenerics::uniqueId())
   if (dir.exists(tmpFolder)) {
-    unlink(x = tmpFolder, recursive = FALSE)
+    unlink(x = tmpFolder, recursive = TRUE)
   }
   dir.create(tmpFolder)
 
@@ -47,17 +46,14 @@ mockCdmFromDataset <- function(datasetName = "GiBleed",
   if (datasetName == "GiBleed") {
     tables$drug_strength <- eunomiaDrugStrength
   } else {
-    concepts <- tables$concept$concept_id
-    tables$drug_strength <- getDrugStrength() |>
-      dplyr::filter(
-        .data$drug_concept_id %in% .env$concepts &
-          .data$ingredient_concept_id %in% .env$concepts
-      )
+    tables$drug_strength <- getDrugStrength()
   }
 
+  cli::cli_inform(c(i = "Creating local {.cls cdm_reference} object."))
   cdm <- omopgenerics::cdmFromTables(tables = tables, cdmName = cn, cdmVersion = cv)
 
   if (identical(source, "duckdb")) {
+    cli::cli_inform(c(i = "Inserting {.cls cdm_reference} into {.pkg duckdb}."))
     rlang::check_installed(c("duckdb", "CDMConnector"))
     tmpFile <- tempfile(fileext = ".duckdb")
     con <- duckdb::dbConnect(drv = duckdb::duckdb(dbdir = tmpFile))
@@ -97,38 +93,47 @@ readTables <- function(tmpFolder, cv, vocab = F) {
   tables
 }
 getDrugStrength <- function() {
-  drugStregthZip <- file.path(mockDatasetsFolder(), "drug_strength.csv")
+  drugStregthFile <- file.path(mockDatasetsFolder(), "drug_strength.rds")
 
   # download if it does not exist
-  if (!file.exists(drugStregthZip)) {
+  if (!file.exists(drugStregthFile)) {
+    # download
     cli::cli_inform(c("i" = "Downloading {.pkg drug_strength} table."))
     dropbox_url <- "https://www.dropbox.com/scl/fi/gw6eou1wrneh2h5w3r5we/drug_strength.zip?rlkey=dssh3kpt56xuenguvym1ml7cc&st=e76jev5j&dl=1"
+    tmpZip <- tempfile(fileext = ".zip")
     utils::download.file(
-      url = dropbox_url, destfile = drugStregthZip, mode = "wb", quiet = FALSE
+      url = dropbox_url, destfile = tmpZip, mode = "wb", quiet = FALSE
     )
+
+    # unzip
+    tempFolder <- file.path(tempdir(), omopgenerics::uniqueId())
+    dir.create(tempFolder, showWarnings = FALSE)
+    utils::unzip(zipfile = tmpZip, exdir = tempFolder)
+    unlink(tmpZip)
+
+    # read drug_strength
+    drugStrength <- readr::read_delim(
+      file = file.path(tempFolder, "drug_strength.csv"),
+      delim = "\t",
+      col_types = c(
+        drug_concept_id = "i", ingredient_concept_id = "i", amount_value = "d",
+        amount_unit_concept_id = "i", numerator_value = "d",
+        numerator_unit_concept_id = "i", denominator_value = "d",
+        denominator_unit_concept_id = "i", box_size = "i", valid_start_date = "D",
+        valid_end_date = "D", invalid_reason = "c"
+      )
+    ) |>
+      suppressWarnings()
+
+    # delete csv file
+    unlink(tempFolder, recursive = TRUE)
+
+    # save RDS
+    saveRDS(drugStrength, file = drugStregthFile)
+  } else {
+    # load from RDS
+    drugStrength <- readRDS(file = drugStregthFile)
   }
-
-  # unzip
-  tempFolder <- file.path(tempdir(), omopgenerics::uniqueId())
-  dir.create(tempFolder, showWarnings = FALSE)
-  utils::unzip(zipfile = drugStregthZip, exdir = tempFolder)
-
-  # read drug_strength
-  drugStrength <- readr::read_delim(
-    file = file.path(tempFolder, "drug_strength.csv"),
-    delim = "\t",
-    col_types = c(
-      drug_concept_id = "i", ingredient_concept_id = "i", amount_value = "d",
-      amount_unit_concept_id = "i", numerator_value = "d",
-      numerator_unit_concept_id = "i", denominator_value = "d",
-      denominator_unit_concept_id = "i", box_size = "i", valid_start_date = "D",
-      valid_end_date = "D", invalid_reason = "c"
-    )
-  ) |>
-    suppressWarnings()
-
-  # delete csv file
-  unlink(tempFolder, recursive = TRUE)
 
   return(drugStrength)
 }
@@ -146,6 +151,9 @@ getDrugStrength <- function() {
 #'   \item{cdm_version}{OMOP CDM version of the dataset.}
 #'   \item{size}{Size in bytes of the dataset.}
 #'   \item{size_mb}{Size in Mega bytes of the dataset.}
+#'   \item{number_individuals}{Number individuals in the dataset.}
+#'   \item{number_records}{Total number of records in the dataset.}
+#'   \item{number_concepts}{Distinct number of concepts in the dataset.}
 #' }
 #'
 #' @examples
@@ -174,10 +182,13 @@ getDrugStrength <- function() {
 #' }
 #'
 downloadMockDataset <- function(datasetName = "GiBleed",
-                                path = mockDatasetsFolder(),
+                                path = NULL,
                                 overwrite = NULL) {
   # initial checks
   datasetName <- validateDatasetName(datasetName)
+  if (is.null(path)) {
+    path <- mockFolder()
+  }
   path <- validatePath(path)
   omopgenerics::assertLogical(overwrite, length = 1, null = TRUE)
 
@@ -203,23 +214,26 @@ downloadMockDataset <- function(datasetName = "GiBleed",
 
   # download dataset
   url <- omock::mockDatasets$url[omock::mockDatasets$dataset_name == datasetName]
-  tryCatch({
-    utils::download.file(url = url, destfile = datasetFile, mode = "wb", quiet = FALSE)
-  }, error = function(e) {
-    if (grepl("timed out|Timeout was reached|Could not resolve host|Operation was aborted", e$message, ignore.case = TRUE)) {
-      cli::cli_abort(c(
-        "x" = "Failed to download dataset `{datasetName}` due to a timeout or network issue.",
-        "i" = "Check your internet connection, or try downloading again later.",
-        "i" = "You may also manually download it from the URL below and place it in {.path {path}}:",
-        " " = "{.url {url}}"
-      ))
-    } else {
-      cli::cli_abort(c(
-        "x" = "An error occurred while downloading dataset `{datasetName}`.",
-        "!" = "{e$message}"
-      ))
+  tryCatch(
+    {
+      utils::download.file(url = url, destfile = datasetFile, mode = "wb", quiet = FALSE)
+    },
+    error = function(e) {
+      if (grepl("timed out|Timeout was reached|Could not resolve host|Operation was aborted", e$message, ignore.case = TRUE)) {
+        cli::cli_abort(c(
+          "x" = "Failed to download dataset `{datasetName}` due to a timeout or network issue.",
+          "i" = "Check your internet connection, or try downloading again later.",
+          "i" = "You may also manually download it from the URL below and place it in {.path {path}}:",
+          " " = "{.url {url}}"
+        ))
+      } else {
+        cli::cli_abort(c(
+          "x" = "An error occurred while downloading dataset `{datasetName}`.",
+          "!" = "{e$message}"
+        ))
+      }
     }
-  })
+  )
 
   invisible(datasetFile)
 }
@@ -228,7 +242,6 @@ downloadMockDataset <- function(datasetName = "GiBleed",
 #'
 #' @param datasetName Name of the mock dataset. See `availableMockDatasets()`
 #' for possibilities.
-#' @param path Path where to search for the dataset.
 #'
 #' @return Whether the dataset is available or not.
 #' @export
@@ -242,13 +255,33 @@ downloadMockDataset <- function(datasetName = "GiBleed",
 #' isMockDatasetDownloaded("GiBleed")
 #' }
 #'
-isMockDatasetDownloaded <- function(datasetName = "GiBleed",
-                                    path = mockDatasetsFolder()) {
+isMockDatasetDownloaded <- function(datasetName = "GiBleed") {
   # initial checks
   datasetName <- validateDatasetName(datasetName)
-  path <- validatePath(path)
 
-  file.exists(file.path(path, paste0(datasetName, ".zip")))
+  filePath <- file.path(mockFolder(), paste0(datasetName, ".zip"))
+  result <- file.exists(filePath)
+
+  # check file is downloaded properly
+  if (isTRUE(result)) {
+    expectedSize <- omock::mockDatasets$size[omock::mockDatasets$dataset_name == datasetName]
+    actualSize <- file.size(filePath)
+    if (actualSize != expectedSize) {
+      cli::cli_warn(c("!" = "There is a downloaded dataset in {.path {filePath}}
+                      but its size ({actualSize} B) is not the expected {expectedSize} B."))
+      if (question("Do you want to delete prior dataset? Y/n")) {
+        file.remove(filePath)
+        cli::cli_inform(c(
+          "v" = "Incomplete prior dataset deleted.",
+          "i" = "Probably connection was trucaded due to small timeout, do you
+          want to set a bigger timeout? {.run options(timeout = 600)}"
+        ))
+        result <- FALSE
+      }
+    }
+  }
+
+  return(result)
 }
 
 #' List the available datasets
@@ -279,7 +312,7 @@ mockDatasetsStatus <- function() {
   x <- omock::mockDatasets |>
     dplyr::select("dataset_name") |>
     dplyr::mutate(exists = dplyr::if_else(file.exists(file.path(
-      mockDatasetsFolder(), paste0(.data$dataset_name, ".zip")
+      mockFolder(), paste0(.data$dataset_name, ".zip")
     )), 1, 0)) |>
     dplyr::arrange(dplyr::desc(.data$exists), .data$dataset_name) |>
     dplyr::mutate(status = dplyr::if_else(.data$exists == 1, "v", "x"))
@@ -287,7 +320,7 @@ mockDatasetsStatus <- function() {
   invisible(x)
 }
 
-#' Check or set the datasets Folder
+#' Deprecated
 #'
 #' @param path Path to a folder to store the synthetic datasets. If NULL the
 #' current OMOP_DATASETS_FOLDER is returned.
@@ -303,50 +336,58 @@ mockDatasetsStatus <- function() {
 #' }
 #'
 mockDatasetsFolder <- function(path = NULL) {
-  if (is.null(path)) {
-    if (Sys.getenv(mockDatasetsKey) == "") {
-      tempMockDatasetsFolder <- file.path(tempdir(), mockDatasetsKey)
-      dir.create(tempMockDatasetsFolder, showWarnings = FALSE)
-      if (rlang::is_interactive()) {
-        cli::cli_inform(c("i" = "`{mockDatasetsKey}` temporarily set to {.path {tempMockDatasetsFolder}}."))
-        cli::cli_inform(c("!" = "Please consider creating a permanent `{mockDatasetsKey}` location."))
-      }
-      arg <- rlang::set_names(x = tempMockDatasetsFolder, nm = mockDatasetsKey)
-      do.call(what = Sys.setenv, args = as.list(arg))
-    }
-    return(Sys.getenv(mockDatasetsKey))
-  } else {
-    omopgenerics::assertCharacter(x = path, length = 1)
-    if (!dir.exists(path)) {
-      cli::cli_inform(c("i" = "Creating {.path {path}}."))
-      dir.create(path)
-    }
-    arg <- rlang::set_names(x = path, nm = mockDatasetsKey)
-    do.call(what = Sys.setenv, args = as.list(arg))
-    if (rlang::is_interactive()) {
-      c("i" = "If you want to create a permanent `{mockDatasetsKey}` write the following in your `.Renviron` file:",
-        "", " " = "{.pkg {mockDatasetsKey}}=\"{path}\"", "") |>
-        cli::cli_inform()
-    }
-    return(invisible(Sys.getenv(mockDatasetsKey)))
-  }
+  lifecycle::deprecate_soft(when = "0.6.0", what = "mockDatasetsFolder()", with = "omopDataFolder()")
+  mockFolder(path = path)
 }
 
+mockFolder <- function(path = NULL) {
+  if (!is.null(path)) {
+    path <- omopDataFolder(path = path)
+  } else {
+    odf <- Sys.getenv("OMOP_DATA_FOLDER")
+    mdf <- Sys.getenv("MOCK_DATASETS_FOLDER")
+    if (odf == "" & mdf != "") {
+      cli::cli_inform(c(
+        i = "`MOCK_DATASETS_FOLDER` environmental variable has been deprecated
+        in favour of `OMOP_DATA_FOLDER`, please change your .Renviron file."
+      ))
+      Sys.setenv("OMOP_DATA_FOLDER" = mdf)
+    }
+    path <- omopDataFolder(path = NULL)
+  }
+
+  datasetsPath <- file.path(path, "mockDatasets")
+  if (!dir.exists(datasetsPath)) {
+    dir.create(path = datasetsPath, recursive = TRUE)
+  }
+
+  # check if existing datasets needs to be moved
+  list.files(path = path) |>
+    purrr::keep(\(x) x %in% paste0(availableMockDatasets(), ".zip")) |>
+    purrr::map(\(x) {
+      from <- file.path(path, x)
+      to <- file.path(datasetsPath, x)
+      file.copy(from = from, to = to)
+      file.remove(from)
+    }) |>
+    invisible()
+
+  return(datasetsPath)
+}
 datasetAvailable <- function(datasetName, call = parent.frame()) {
-  folder <- mockDatasetsFolder()
-  if (!isMockDatasetDownloaded(datasetName = datasetName, path = folder)) {
+  if (!isMockDatasetDownloaded(datasetName = datasetName)) {
     if (question(paste0("`", datasetName, "` is not downloaded, do you want to download it? Y/n"))) {
-      downloadMockDataset(datasetName = datasetName, path = folder)
+      downloadMockDataset(datasetName = datasetName)
     } else {
       cli::cli_abort(c(x = "`{datasetName}` is not downloaded."), call = call)
     }
   }
-  file.path(folder, paste0(datasetName, ".zip"))
+  file.path(mockFolder(), paste0(datasetName, ".zip"))
 }
 question <- function(message) {
   if (rlang::is_interactive()) {
     x <- ""
-    while(!x %in% c("yes", "no")) {
+    while (!x %in% c("yes", "no")) {
       cli::cli_inform(message = message)
       x <- tolower(readline())
       x[x == "y"] <- "yes"
@@ -379,12 +420,13 @@ castColumns <- function(x, name, version) {
       fun <- as.character
     } else {
       fun <- switch(type,
-                    integer = as.integer,
-                    datetime = as.POSIXct,
-                    date = as.Date,
-                    float = as.numeric,
-                    logical = as.logical,
-                    NULL)
+        integer = as.integer,
+        datetime = as.POSIXct,
+        date = as.Date,
+        float = as.numeric,
+        logical = as.logical,
+        NULL
+      )
     }
     if (!is.null(fun)) {
       x[[cols$cdm_field_name[k]]] <- do.call(fun, list(x[[cols$cdm_field_name[k]]]))
@@ -413,5 +455,4 @@ filterToVocab <- function(path) {
   filtered_paths <- path[grepl(t, path)]
 
   return(filtered_paths)
-
 }

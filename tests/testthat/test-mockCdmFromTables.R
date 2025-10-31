@@ -54,7 +54,7 @@ test_that("check cdm object get created", {
   )
 
   expect_no_warning(omock::emptyCdmReference(cdmName = "mock") |>
-                      omock::mockCdmFromTables(tables = list(index_cohort = indexCohort, marker_cohort = markerCohort)))
+    omock::mockCdmFromTables(tables = list(index_cohort = indexCohort, marker_cohort = markerCohort)))
 
   cdm <- omock::emptyCdmReference(cdmName = "mock") |>
     omock::mockCdmFromTables(tables = list(index_cohort = indexCohort, marker_cohort = markerCohort))
@@ -66,7 +66,7 @@ test_that("check cdm object get created", {
   expect_true(attributes(cdm$marker_cohort)$cohort_set |> dplyr::tally() > 0)
   expect_true(attributes(cdm$index_cohort)$cohort_set |> dplyr::tally() > 0)
 
-  tables = list(
+  tables <- list(
     observation_period = dplyr::tibble(
       observation_period_id = as.integer(1:8),
       person_id = c(1, 1, 1, 2, 2, 3, 3, 4) |> as.integer(),
@@ -94,7 +94,8 @@ test_that("check cdm object get created", {
           "2020-12-10"
         )
       )
-    ))
+    )
+  )
 
 
   cdm <- omock::mockCdmFromTables(tables = tables)
@@ -114,7 +115,6 @@ test_that("check cdm object get created", {
   )
 
   expect_true(cdm$person |> nrow() == 4)
-
 })
 
 dd <- omock::mockCdmFromTables(tables = list(
@@ -151,20 +151,19 @@ dd <- omock::mockCdmFromTables(tables = list(
 
 test_that("check NA", {
   expect_error(omock::mockCdmFromTables(
-  tables = list(
-    visit_occurrence = dplyr::tibble(
-      person_id = c(1L, 1L, 2L),
-      visit_start_date = as.Date("2020-01-01") + c(0L, 29L, 70L),
-      visit_end_date = as.Date("2020-01-01") + c(30L, 45L, 89L),
-    ),
-    condition_occurrence = dplyr::tibble(
-      person_id = c(1L, 2L, 2L),
-      condition_start_date = as.Date("2020-01-01") + c(50L, 51L, 89L),
-      condition_end_date = as.Date("2020-01-01") + c(NA, 77L, 90L)
+    tables = list(
+      visit_occurrence = dplyr::tibble(
+        person_id = c(1L, 1L, 2L),
+        visit_start_date = as.Date("2020-01-01") + c(0L, 29L, 70L),
+        visit_end_date = as.Date("2020-01-01") + c(30L, 45L, 89L),
+      ),
+      condition_occurrence = dplyr::tibble(
+        person_id = c(1L, 2L, 2L),
+        condition_start_date = as.Date("2020-01-01") + c(50L, 51L, 89L),
+        condition_end_date = as.Date("2020-01-01") + c(NA, 77L, 90L)
+      )
     )
-  )
-)
-)
+  ))
 
 
   expect_error(omock::mockCdmFromTables(
@@ -180,8 +179,7 @@ test_that("check NA", {
         condition_end_date = as.Date("2020-01-01") + c(NA, 77L, 90L)
       )
     )
-  )
-  )
+  ))
 
   expect_no_warning(omock::mockCdmFromTables(
     tables = list(
@@ -213,5 +211,80 @@ test_that("check NA", {
     )
   ))
 
+  expect_no_warning(omock::mockCdmFromTables(tables = list(
+    observation_period = dplyr::tibble(
+      "observation_period_id" = c(1L, 2L, 3L),
+      "person_id" = c(1L, 2L, 3L),
+      "observation_period_start_date" = as.Date("2000-01-01"),
+      "observation_period_end_date" = as.Date("2024-01-01"),
+      "period_type_concept_id" = 1L
+    ),
+    cohort = dplyr::tibble(
+      "cohort_definition_id" = 1L,
+      "subject_id" = c(1L, 1L, 2L, 3L),
+      "cohort_start_date" = as.Date(c(
+        "2020-01-01", "2020-01-12", "2021-01-01", "2022-01-01"
+      )),
+      "cohort_end_date" = as.Date(c(
+        "2020-01-10", "2020-01-15", "2021-01-01", "2022-01-01"
+      ))
+    )
+  )))
 
+  cdm <- omock::mockCdmFromTables(tables = list(
+    cohort = dplyr::tibble(
+      "cohort_definition_id" = 1L,
+      "subject_id" = 1L,
+      "cohort_start_date" = as.Date("2020-01-01"),
+      "cohort_end_date" = as.Date("2020-01-01")
+    ),
+    concept = dplyr::tibble(
+      "concept_id" = 1L,
+      "concept_name" = "my concept",
+      "domain_id" = "drug",
+      "vocabulary_id" = NA_integer_,
+      "concept_class_id" = NA_integer_,
+      "concept_code" = NA_integer_,
+      "valid_start_date" = as.Date("1900-01-01"),
+      "valid_end_date" = as.Date("2100-01-01")
+    ),
+    drug_exposure = dplyr::tibble(
+      "drug_exposure_id" = c(1L, 2L),
+      "person_id" = 1L,
+      "drug_concept_id" = 1L,
+      "drug_exposure_start_date" = as.Date(c("2020-01-01", "2021-01-01")),
+      "drug_exposure_end_date" = as.Date(c("2020-01-15", "2021-01-15")),
+      "drug_type_concept_id" = 1L,
+      verbatim_end_date = drug_exposure_end_date
+    ),
+    observation_period = dplyr::tibble(
+      "observation_period_id" = c(1L, 2L),
+      "person_id" = 1L,
+      "period_type_concept_id" = 1L,
+      "observation_period_start_date" = as.Date(c("2020-01-01", "2021-01-01")),
+      "observation_period_end_date" = as.Date(c("2020-06-01", "2021-06-01"))
+    )
+  ))
+
+  expect_true(all(
+    cdm$observation_period |> dplyr::pull("observation_period_start_date") %in%
+      c("2020-01-01", "2021-01-01")
+  ))
+
+  expect_error(omock::mockCdmFromTables(tables = list("person" = dplyr::tibble(
+    "person_id" = c(1L, 2L, 3L)
+  ))))
+
+  # cdm with just person table
+  expect_no_error(cdm <- omock::mockCdmFromTables(tables = list(
+    person = dplyr::tibble(
+      person_id = 1:4,
+      gender_concept_id = c(8532L, 8507L, 8507L, 8507L),
+      year_of_birth = c(1997L, 1963L, 1986L, 1978L),
+      month_of_birth = c(8L, 1L, 3L, 11L),
+      day_of_birth = c(22L, 27L, 10L, 8L),
+      race_concept_id = NA_integer_,
+      ethnicity_concept_id = NA_integer_
+    )
+  )))
 })

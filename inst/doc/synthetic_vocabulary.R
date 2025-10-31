@@ -35,9 +35,10 @@ myConceptTable <- data.frame(
   invalid_reason = NA
 )
 
-cdm <- mockVocabularyTables(cdm, 
-                            vocabularySet = "eunomia",
-                            concept = myConceptTable) 
+cdm <- mockVocabularyTables(cdm,
+  vocabularySet = "eunomia",
+  concept = myConceptTable
+)
 
 cdm$concept |> print()
 

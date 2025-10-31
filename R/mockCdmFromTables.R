@@ -59,21 +59,25 @@ mockCdmFromTables <- function(cdm = mockCdmReference(),
 
   # initial checks
   omopgenerics::validateCdmArgument(cdm = cdm)
-  omopgenerics::assertNumeric(seed,integerish = TRUE, min = 1,
-                              length = 1, null = TRUE)
+  omopgenerics::assertNumeric(seed,
+    integerish = TRUE, min = 1,
+    length = 1, null = TRUE
+  )
   omopgenerics::assertDate(maxObservationalPeriodEndDate,
-                           length = 1, null = FALSE)
+    length = 1, null = FALSE
+  )
 
-  if(maxObservationalPeriodEndDate > Sys.Date()){
+  if (maxObservationalPeriodEndDate > Sys.Date()) {
     cli::cli_abort("maxObservationalPeriodEndDate provided is greater than current date",
-                   call = parent.frame())
+      call = parent.frame()
+    )
   }
 
-  #flag input with observation_period table only
+  # flag input with observation_period table only
   if (all(names(tables) == "observation_period")) {
-    obsFlag = T
-  } else{
-    obsFlag = F
+    obsFlag <- T
+  } else {
+    obsFlag <- F
   }
 
   tables <- validateTables(tables)
@@ -83,6 +87,8 @@ mockCdmFromTables <- function(cdm = mockCdmReference(),
   if (length(tables) == 0) {
     return(cdm)
   }
+
+  tables_temp <- tables
 
   # append cdm tables to tables
   tables <- mergeTables(tables, cdm)
@@ -95,21 +101,28 @@ mockCdmFromTables <- function(cdm = mockCdmReference(),
       "tables provided contain date greater than `maxObservationalPeriodEndDate`",
       call = parent.frame()
     )
-
   }
 
   # get observation period times and birth dates
-  dates <- calculateDates(individuals, meanBirthStart, meanStartFirst, meanLastEnd)
+  if ("person" %in% names(tables_temp)) {
+    dates <- calculateDates2(individuals, meanBirthStart, meanStartFirst, meanLastEnd)
+  } else {
+    dates <- calculateDates(individuals, meanBirthStart, meanStartFirst, meanLastEnd)
+  }
 
   # create person
-  tables <- createPersonTable(dates = dates, tables = tables)
 
+  if (nrow(tables[["person"]]) == 0) {
+    tables <- createPersonTable(dates = dates, tables = tables)
+  }
   # correct end dates based on death
   dates <- correctDateDeath(dates = dates, tables = tables)
 
   # get observation_period
   if (!obsFlag) {
-    tables <- createObservationPeriodTable(dates = dates, tables = tables)
+    if (nrow(tables[["observation_period"]]) == 0) {
+      tables <- createObservationPeriodTable(dates = dates, tables = tables)
+    }
   } else {
     cli::cli_inform(
       "! Input tables only contain the observation_period table, hence only the person table will be updated",
@@ -124,7 +137,7 @@ mockCdmFromTables <- function(cdm = mockCdmReference(),
 
   omopTables <- tables[names(tables) %in% omopgenerics::omopTables()]
   cohortTables <- tables[!names(tables) %in% omopgenerics::omopTables()]
-  for (tables in names(cohortTables)){
+  for (tables in names(cohortTables)) {
     cohortTables[[tables]] <- cohortTables[[tables]] |>
       correctCdmFormat("cohort_definition") |>
       dplyr::mutate(subject_id = as.integer(.data$subject_id))
@@ -148,7 +161,9 @@ mergeTables <- function(tables, cdm, call = parent.frame()) {
   }
   for (nm in names(cdm)) {
     if (nm %in% names(tables)) {
-      cli::cli_warn(c("!" = "{nm} table will be overwritten", call = call))
+      if (nrow(cdm[[nm]]) > 0) {
+        cli::cli_warn(c("!" = "{nm} table will be overwritten", call = call))
+      }
     } else {
       tables[[nm]] <- cdm[[nm]]
     }
@@ -227,7 +242,6 @@ getPersonId <- function(tableName) {
     x <- "subject_id"
   }
   return(x)
-
 }
 getStartDate <- function(tableName) {
   if (tableName %in% namesTable$table_name) {
@@ -251,36 +265,65 @@ summariseObservations <- function(tables) {
   )
   for (k in seq_along(tables)) {
     tableName <- names(tables)[k]
-    personId <- getPersonId(tableName)
-    startDate <- getStartDate(tableName)
-    endDate <- getEndDate(tableName)
-    if (!is.na(personId)) {
-      individuals <- individuals |>
-        dplyr::union_all(
-          tables[[k]] |>
-            dplyr::select(
-              "person_id" = dplyr::all_of(personId),
-              "date" = dplyr::all_of(startDate)
+
+    if (tableName == "person") {
+      dob <- tables[[tableName]] |>
+        dplyr::mutate(
+          derived_birth_date =
+            ifelse(
+              !is.na(.data$year_of_birth),
+              sprintf(
+                "%02d-%02d-%04d",
+                dplyr::coalesce(.data$day_of_birth, 1L),
+                dplyr::coalesce(.data$month_of_birth, 1L),
+                .data$year_of_birth
+              ),
+              NA_character_
             )
-        )
-      if (endDate != startDate) {
+        ) |>
+        dplyr::mutate(
+          "date" =
+            as.Date(.data$derived_birth_date, "%d-%m-%Y")
+        ) |>
+        dplyr::select("person_id", "date")
+
+      individuals <- individuals |>
+        dplyr::union_all(dob)
+    } else {
+      personId <- getPersonId(tableName)
+      startDate <- getStartDate(tableName)
+      endDate <- getEndDate(tableName)
+
+      if (!is.na(personId)) {
         individuals <- individuals |>
           dplyr::union_all(
             tables[[k]] |>
               dplyr::select(
                 "person_id" = dplyr::all_of(personId),
-                "date" = dplyr::all_of(endDate)
+                "date" = dplyr::all_of(startDate)
               )
           )
+        if (endDate != startDate) {
+          individuals <- individuals |>
+            dplyr::union_all(
+              tables[[k]] |>
+                dplyr::select(
+                  "person_id" = dplyr::all_of(personId),
+                  "date" = dplyr::all_of(endDate)
+                )
+            )
+        }
       }
     }
   }
+
   individuals <- individuals |>
     dplyr::group_by(.data$person_id) |>
     dplyr::summarise(
       "first_observation" = min(.data$date),
       "last_observation" = max(.data$date)
     )
+
   return(individuals)
 }
 calculateDates <- function(individuals, meanBirthStart, meanStartFirst, meanLastEnd, maxEnd = "01-01-2024") {
@@ -290,6 +333,7 @@ calculateDates <- function(individuals, meanBirthStart, meanStartFirst, meanLast
       as.integer()
   }
   n <- nrow(individuals)
+
   individuals |>
     dplyr::mutate(
       "birth_start" = randomExp(n = n, rate = 1 / meanBirthStart),
@@ -301,14 +345,54 @@ calculateDates <- function(individuals, meanBirthStart, meanStartFirst, meanLast
       "start_observation" = .data$first_observation - .data$start_first,
       "end_observation" = .data$last_observation + .data$last_end,
       "birth_date" = .data$start_observation - .data$birth_start
-    ) |> dplyr::rowwise() |>
-    dplyr::mutate("start_observation" = min(.data$start_observation, .data$max),
-                  "end_observation" = min(.data$end_observation, .data$max)) |>
+    ) |>
+    dplyr::rowwise() |>
+    dplyr::mutate(
+      "start_observation" = min(.data$start_observation, .data$max),
+      "end_observation" = min(.data$end_observation, .data$max)
+    ) |>
     dplyr::ungroup() |>
     dplyr::select(
       "person_id", "birth_date", "start_observation", "end_observation"
     )
 }
+
+calculateDates2 <- function(individuals, meanBirthStart, meanStartFirst, meanLastEnd, maxEnd = "01-01-2024") {
+  randomExp <- function(n, rate) {
+    stats::rexp(n = n, rate = rate) |>
+      round() |>
+      as.integer()
+  }
+  n <- nrow(individuals)
+
+  individuals |>
+    dplyr::mutate(
+      "birth_start" = randomExp(n = n, rate = 1 / meanBirthStart),
+      "start_first" = randomExp(n = n, rate = 1 / meanStartFirst),
+      "last_end" = randomExp(n = n, rate = 1 / meanLastEnd)
+    ) |>
+    dplyr::mutate(
+      "max" = as.Date(maxEnd, "%d-%m-%Y"),
+      "start_observation" = .data$first_observation + .data$start_first,
+      "end_observation" = .data$last_observation + .data$last_end + .data$start_first,
+      "birth_date" = .data$start_observation
+    ) |>
+    dplyr::rowwise() |>
+    dplyr::mutate("start_observation" = max(
+      min(.data$start_observation, .data$max),
+      .data$birth_date
+    )) |>
+    dplyr::mutate("end_observation" = max(
+      min(.data$end_observation, .data$max),
+      .data$start_observation
+    )) |>
+    dplyr::ungroup() |>
+    dplyr::select(
+      "person_id", "birth_date", "start_observation", "end_observation"
+    )
+}
+
+
 createPersonTable <- function(dates, tables) {
   raceConcepts <- getRaceConcepts(tables)
   ethnicityConcepts <- getEthnicityConcepts(tables)
@@ -319,9 +403,9 @@ createPersonTable <- function(dates, tables) {
     dplyr::select("person_id", "birth_date") |>
     dplyr::mutate(
       "gender_concept_id" = sample(x = c(8507, 8532), size = n, replace = TRUE),
-      "year_of_birth" = lubridate::year(.data$birth_date),
-      "month_of_birth" = lubridate::month(.data$birth_date),
-      "day_of_birth" = lubridate::day(.data$birth_date),
+      "year_of_birth" = clock::get_year(.data$birth_date),
+      "month_of_birth" = clock::get_month(.data$birth_date),
+      "day_of_birth" = clock::get_day(.data$birth_date),
       "birth_datetime" = .data$birth_date,
       "race_concept_id" = sample(x = raceConcepts, size = n, replace = TRUE),
       "ethnicity_concept_id" = sample(x = ethnicityConcepts, size = n, replace = TRUE),
@@ -336,7 +420,7 @@ createPersonTable <- function(dates, tables) {
       "ethnicity_source_concept_id" = 0L
     ) |>
     dplyr::inner_join(providers, by = "pc_id") |>
-    dplyr::select(-"birth_date", -"pc_id")|>
+    dplyr::select(-"birth_date", -"pc_id") |>
     addOtherColumns("person") |>
     correctCdmFormat("person")
   return(tables)
@@ -354,7 +438,7 @@ correctDateDeath <- function(dates, tables) {
         .data$death_date,
         .data$end_observation
       )) |>
-      dplyr::select(-"death_date")|>
+      dplyr::select(-"death_date") |>
       addOtherColumns("death") |>
       correctCdmFormat("death")
   }

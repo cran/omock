@@ -50,22 +50,18 @@ mockDrugExposure <- function(cdm,
     cli::cli_abort("person and observation_period table cannot be empty")
   }
 
+  concept_id <- getConceptId(cdm = cdm, type = "Drug")
+  type_id <- getConceptId(cdm = cdm, type = "Drug Type")
 
-
-  concept_id <-
-    cdm$concept |>
-    dplyr::filter(.data$domain_id == "Drug" &
-                    .data$standard_concept == "S") |>
-    dplyr::select("concept_id") |>
-    dplyr::pull() |>
-    unique()
+  if (length(type_id) == 0) {
+    type_id <- 0L
+  }
 
   # concept count
   concept_count <- length(concept_id)
 
   # number of rows per concept_id
-  numberRows <-
-    recordPerson * (cdm$person |> dplyr::tally() |> dplyr::pull()) |> round()
+  numberRows <- recordPerson * nrow(cdm$person) |> round()
 
   drug <- list()
 
@@ -86,24 +82,19 @@ mockDrugExposure <- function(cdm,
       )
   }
 
-
-  drug <-
-    drug |>
+  drug <- drug |>
     dplyr::bind_rows() |>
     dplyr::mutate(
       drug_exposure_id = dplyr::row_number(),
-      drug_type_concept_id = 1
+      drug_type_concept_id = if (length(type_id) > 1) {
+        sample(c(type_id), size = dplyr::n(), replace = TRUE)
+      } else {
+        type_id
+      }
     ) |>
     dplyr::rename(person_id = "subject_id") |>
     addOtherColumns(tableName = "drug_exposure") |>
     correctCdmFormat(tableName = "drug_exposure")
 
-  cdm <-
-    omopgenerics::insertTable(
-      cdm = cdm,
-      name = "drug_exposure",
-      table = drug
-    )
-
-  return(cdm)
+  omopgenerics::insertTable(cdm = cdm, name = "drug_exposure", table = drug)
 }

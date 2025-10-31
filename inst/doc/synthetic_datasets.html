@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>synthetic_datasets</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">synthetic_datasets</h1>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>As seen in other vignettes <strong>omock</strong> provides you with
+functionality to build. synthetic datasets. <strong>omock</strong> also
+provides some prebuilt synthetics datasets, those datasets are widely
+available and were created by the OHDSI community.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(omock)</span></code></pre></div>
+</div>
+<div id="avialable-datasets" class="section level2">
+<h2>Avialable datasets</h2>
+<p>The available datasets are listed below:</p>
+<div id="qgbrspclng" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#qgbrspclng table {
+font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+}
+#qgbrspclng thead, #qgbrspclng tbody, #qgbrspclng tfoot, #qgbrspclng tr, #qgbrspclng td, #qgbrspclng th {
+border-style: none;
+}
+#qgbrspclng p {
+margin: 0;
+padding: 0;
+}
+#qgbrspclng .gt_table {
+display: table;
+border-collapse: collapse;
+line-height: normal;
+margin-left: auto;
+margin-right: auto;
+color: #333333;
+font-size: 16px;
+font-weight: normal;
+font-style: normal;
+background-color: #FFFFFF;
+width: auto;
+border-top-style: solid;
+border-top-width: 2px;
+border-top-color: #A8A8A8;
+border-right-style: none;
+border-right-width: 2px;
+border-right-color: #D3D3D3;
+border-bottom-style: solid;
+border-bottom-width: 2px;
+border-bottom-color: #A8A8A8;
+border-left-style: none;
+border-left-width: 2px;
+border-left-color: #D3D3D3;
+}
+#qgbrspclng .gt_caption {
+padding-top: 4px;
+padding-bottom: 4px;
+}
+#qgbrspclng .gt_title {
+color: #333333;
+font-size: 125%;
+font-weight: initial;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+border-bottom-color: #FFFFFF;
+border-bottom-width: 0;
+}
+#qgbrspclng .gt_subtitle {
+color: #333333;
+font-size: 85%;
+font-weight: initial;
+padding-top: 3px;
+padding-bottom: 5px;
+padding-left: 5px;
+padding-right: 5px;
+border-top-color: #FFFFFF;
+border-top-width: 0;
+}
+#qgbrspclng .gt_heading {
+background-color: #FFFFFF;
+text-align: center;
+border-bottom-color: #FFFFFF;
+border-left-style: none;
+border-left-width: 1px;
+border-left-color: #D3D3D3;
+border-right-style: none;
+border-right-width: 1px;
+border-right-color: #D3D3D3;
+}
+#qgbrspclng .gt_bottom_border {
+border-bottom-style: solid;
+border-bottom-width: 2px;
+border-bottom-color: #D3D3D3;
+}
+#qgbrspclng .gt_col_headings {
+border-top-style: solid;
+border-top-width: 2px;
+border-top-color: #D3D3D3;
+border-bottom-style: solid;
+border-bottom-width: 2px;
+border-bottom-color: #D3D3D3;
+border-left-style: none;
+border-left-width: 1px;
+border-left-color: #D3D3D3;
+border-right-style: none;
+border-right-width: 1px;
+border-right-color: #D3D3D3;
+}
+#qgbrspclng .gt_col_heading {
+color: #333333;
+background-color: #FFFFFF;
+font-size: 100%;
+font-weight: normal;
+text-transform: inherit;
+border-left-style: none;
+border-left-width: 1px;
+border-left-color: #D3D3D3;
+border-right-style: none;
+border-right-width: 1px;
+border-right-color: #D3D3D3;
+vertical-align: bottom;
+padding-top: 5px;
+padding-bottom: 6px;
+padding-left: 5px;
+padding-right: 5px;
+overflow-x: hidden;
+}
+#qgbrspclng .gt_column_spanner_outer {
+color: #333333;
+background-color: #FFFFFF;
+font-size: 100%;
+font-weight: normal;
+text-transform: inherit;
+padding-top: 0;
+padding-bottom: 0;
+padding-left: 4px;
+padding-right: 4px;
+}
+#qgbrspclng .gt_column_spanner_outer:first-child {
+padding-left: 0;
+}
+#qgbrspclng .gt_column_spanner_outer:last-child {
+padding-right: 0;
+}
+#qgbrspclng .gt_column_spanner {
+border-bottom-style: solid;
+border-bottom-width: 2px;
+border-bottom-color: #D3D3D3;
+vertical-align: bottom;
+padding-top: 5px;
+padding-bottom: 5px;
+overflow-x: hidden;
+display: inline-block;
+width: 100%;
+}
+#qgbrspclng .gt_spanner_row {
+border-bottom-style: hidden;
+}
+#qgbrspclng .gt_group_heading {
+padding-top: 8px;
+padding-bottom: 8px;
+padding-left: 5px;
+padding-right: 5px;
+color: #333333;
+background-color: #FFFFFF;
+font-size: 100%;
+font-weight: initial;
+text-transform: inherit;
+border-top-style: solid;
+border-top-width: 2px;
+border-top-color: #D3D3D3;
+border-bottom-style: solid;
+border-bottom-width: 2px;
+border-bottom-color: #D3D3D3;
+border-left-style: none;
+border-left-width: 1px;
+border-left-color: #D3D3D3;
+border-right-style: none;
+border-right-width: 1px;
+border-right-color: #D3D3D3;
+vertical-align: middle;
+text-align: left;
+}
+#qgbrspclng .gt_empty_group_heading {
+padding: 0.5px;
+color: #333333;
+background-color: #FFFFFF;
+font-size: 100%;
+font-weight: initial;
+border-top-style: solid;
+border-top-width: 2px;
+border-top-color: #D3D3D3;
+border-bottom-style: solid;
+border-bottom-width: 2px;
+border-bottom-color: #D3D3D3;
+vertical-align: middle;
+}
+#qgbrspclng .gt_from_md > :first-child {
+margin-top: 0;
+}
+#qgbrspclng .gt_from_md > :last-child {
+margin-bottom: 0;
+}
+#qgbrspclng .gt_row {
+padding-top: 8px;
+padding-bottom: 8px;
+padding-left: 5px;
+padding-right: 5px;
+margin: 10px;
+border-top-style: solid;
+border-top-width: 1px;
+border-top-color: #D3D3D3;
+border-left-style: none;
+border-left-width: 1px;
+border-left-color: #D3D3D3;
+border-right-style: none;
+border-right-width: 1px;
+border-right-color: #D3D3D3;
+vertical-align: middle;
+overflow-x: hidden;
+}
+#qgbrspclng .gt_stub {
+color: #333333;
+background-color: #FFFFFF;
+font-size: 100%;
+font-weight: initial;
+text-transform: inherit;
+border-right-style: solid;
+border-right-width: 2px;
+border-right-color: #D3D3D3;
+padding-left: 5px;
+padding-right: 5px;
+}
+#qgbrspclng .gt_stub_row_group {
+color: #333333;
+background-color: #FFFFFF;
+font-size: 100%;
+font-weight: initial;
+text-transform: inherit;
+border-right-style: solid;
+border-right-width: 2px;
+border-right-color: #D3D3D3;
+padding-left: 5px;
+padding-right: 5px;
+vertical-align: top;
+}
+#qgbrspclng .gt_row_group_first td {
+border-top-width: 2px;
+}
+#qgbrspclng .gt_row_group_first th {
+border-top-width: 2px;
+}
+#qgbrspclng .gt_summary_row {
+color: #333333;
+background-color: #FFFFFF;
+text-transform: inherit;
+padding-top: 8px;
+padding-bottom: 8px;
+padding-left: 5px;
+padding-right: 5px;
+}
+#qgbrspclng .gt_first_summary_row {
+border-top-style: solid;
+border-top-color: #D3D3D3;
+}
+#qgbrspclng .gt_first_summary_row.thick {
+border-top-width: 2px;
+}
+#qgbrspclng .gt_last_summary_row {
+padding-top: 8px;
+padding-bottom: 8px;
+padding-left: 5px;
+padding-right: 5px;
+border-bottom-style: solid;
+border-bottom-width: 2px;
+border-bottom-color: #D3D3D3;
+}
+#qgbrspclng .gt_grand_summary_row {
+color: #333333;
+background-color: #FFFFFF;
+text-transform: inherit;
+padding-top: 8px;
+padding-bottom: 8px;
+padding-left: 5px;
+padding-right: 5px;
+}
+#qgbrspclng .gt_first_grand_summary_row {
+padding-top: 8px;
+padding-bottom: 8px;
+padding-left: 5px;
+padding-right: 5px;
+border-top-style: double;
+border-top-width: 6px;
+border-top-color: #D3D3D3;
+}
+#qgbrspclng .gt_last_grand_summary_row_top {
+padding-top: 8px;
+padding-bottom: 8px;
+padding-left: 5px;
+padding-right: 5px;
+border-bottom-style: double;
+border-bottom-width: 6px;
+border-bottom-color: #D3D3D3;
+}
+#qgbrspclng .gt_striped {
+background-color: rgba(128, 128, 128, 0.05);
+}
+#qgbrspclng .gt_table_body {
+border-top-style: solid;
+border-top-width: 2px;
+border-top-color: #D3D3D3;
+border-bottom-style: solid;
+border-bottom-width: 2px;
+border-bottom-color: #D3D3D3;
+}
+#qgbrspclng .gt_footnotes {
+color: #333333;
+background-color: #FFFFFF;
+border-bottom-style: none;
+border-bottom-width: 2px;
+border-bottom-color: #D3D3D3;
+border-left-style: none;
+border-left-width: 2px;
+border-left-color: #D3D3D3;
+border-right-style: none;
+border-right-width: 2px;
+border-right-color: #D3D3D3;
+}
+#qgbrspclng .gt_footnote {
+margin: 0px;
+font-size: 90%;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+}
+#qgbrspclng .gt_sourcenotes {
+color: #333333;
+background-color: #FFFFFF;
+border-bottom-style: none;
+border-bottom-width: 2px;
+border-bottom-color: #D3D3D3;
+border-left-style: none;
+border-left-width: 2px;
+border-left-color: #D3D3D3;
+border-right-style: none;
+border-right-width: 2px;
+border-right-color: #D3D3D3;
+}
+#qgbrspclng .gt_sourcenote {
+font-size: 90%;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+}
+#qgbrspclng .gt_left {
+text-align: left;
+}
+#qgbrspclng .gt_center {
+text-align: center;
+}
+#qgbrspclng .gt_right {
+text-align: right;
+font-variant-numeric: tabular-nums;
+}
+#qgbrspclng .gt_font_normal {
+font-weight: normal;
+}
+#qgbrspclng .gt_font_bold {
+font-weight: bold;
+}
+#qgbrspclng .gt_font_italic {
+font-style: italic;
+}
+#qgbrspclng .gt_super {
+font-size: 65%;
+}
+#qgbrspclng .gt_footnote_marks {
+font-size: 75%;
+vertical-align: 0.4em;
+position: initial;
+}
+#qgbrspclng .gt_asterisk {
+font-size: 100%;
+vertical-align: 0;
+}
+#qgbrspclng .gt_indent_1 {
+text-indent: 5px;
+}
+#qgbrspclng .gt_indent_2 {
+text-indent: 10px;
+}
+#qgbrspclng .gt_indent_3 {
+text-indent: 15px;
+}
+#qgbrspclng .gt_indent_4 {
+text-indent: 20px;
+}
+#qgbrspclng .gt_indent_5 {
+text-indent: 25px;
+}
+#qgbrspclng .katex-display {
+display: inline-flex !important;
+margin-bottom: 0.75em !important;
+}
+#qgbrspclng div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+height: 0px !important;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="datasetName">datasetName</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="CDM-name">CDM name</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="CDM-version">CDM version</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Size">Size</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Number-individuals">Number individuals</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Number-records">Number records</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Number-concepts">Number concepts</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Link">Link</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="datasetName" class="gt_row gt_left">GiBleed</td>
+<td headers="CDM name" class="gt_row gt_left">GiBleed</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">6.44 MB</td>
+<td headers="Number individuals" class="gt_row gt_right">  2,694</td>
+<td headers="Number records" class="gt_row gt_right">  215,978</td>
+<td headers="Number concepts" class="gt_row gt_right">   320</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/GiBleed.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">empty_cdm</td>
+<td headers="CDM name" class="gt_row gt_left">empty_cdm</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">783. MB</td>
+<td headers="Number individuals" class="gt_row gt_right">      0</td>
+<td headers="Number records" class="gt_row gt_right">        0</td>
+<td headers="Number concepts" class="gt_row gt_right">     0</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/empty_cdm.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synpuf-1k_5.3</td>
+<td headers="CDM name" class="gt_row gt_left">synpuf-1k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">566. MB</td>
+<td headers="Number individuals" class="gt_row gt_right">  1,000</td>
+<td headers="Number records" class="gt_row gt_right">  290,059</td>
+<td headers="Number concepts" class="gt_row gt_right">16,131</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synpuf-1k_5.3.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synpuf-1k_5.4</td>
+<td headers="CDM name" class="gt_row gt_left">synpuf-1k</td>
+<td headers="CDM version" class="gt_row gt_right">5.4</td>
+<td headers="Size" class="gt_row gt_left">379. MB</td>
+<td headers="Number individuals" class="gt_row gt_right">  1,000</td>
+<td headers="Number records" class="gt_row gt_right">  290,059</td>
+<td headers="Number concepts" class="gt_row gt_right">16,131</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synpuf-1k_5.4.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-allergies-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-allergies-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,703</td>
+<td headers="Number records" class="gt_row gt_right">  354,551</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-allergies-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-anemia-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-anemia-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,679</td>
+<td headers="Number records" class="gt_row gt_right">  354,713</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-anemia-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-breast_cancer-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-breast_cancer-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">802. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,751</td>
+<td headers="Number records" class="gt_row gt_right">  364,817</td>
+<td headers="Number concepts" class="gt_row gt_right">    85</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-breast_cancer-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-contraceptives-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-contraceptives-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">803. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,728</td>
+<td headers="Number records" class="gt_row gt_right">  367,118</td>
+<td headers="Number concepts" class="gt_row gt_right">    72</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-contraceptives-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-covid19-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-covid19-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">802. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,754</td>
+<td headers="Number records" class="gt_row gt_right">  371,322</td>
+<td headers="Number concepts" class="gt_row gt_right">   105</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-covid19-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-covid19-200k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-covid19-200k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">1.10 GB</td>
+<td headers="Number individuals" class="gt_row gt_right">213,953</td>
+<td headers="Number records" class="gt_row gt_right">7,304,754</td>
+<td headers="Number concepts" class="gt_row gt_right">   110</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-covid19-200k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-dermatitis-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-dermatitis-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,713</td>
+<td headers="Number records" class="gt_row gt_right">  355,896</td>
+<td headers="Number concepts" class="gt_row gt_right">    50</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-dermatitis-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-heart-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-heart-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,683</td>
+<td headers="Number records" class="gt_row gt_right">  354,908</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-heart-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-hiv-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-hiv-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,682</td>
+<td headers="Number records" class="gt_row gt_right">  354,518</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-hiv-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-lung_cancer-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-lung_cancer-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">802. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,756</td>
+<td headers="Number records" class="gt_row gt_right">  374,965</td>
+<td headers="Number concepts" class="gt_row gt_right">    69</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-lung_cancer-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-medications-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-medications-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,681</td>
+<td headers="Number records" class="gt_row gt_right">  354,828</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-medications-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-metabolic_syndrome-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-metabolic_syndrome-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,682</td>
+<td headers="Number records" class="gt_row gt_right">  354,599</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-metabolic_syndrome-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-opioid_addiction-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-opioid_addiction-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">803. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,738</td>
+<td headers="Number records" class="gt_row gt_right">  360,930</td>
+<td headers="Number concepts" class="gt_row gt_right">    54</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-opioid_addiction-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-rheumatoid_arthritis-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-rheumatoid_arthritis-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,734</td>
+<td headers="Number records" class="gt_row gt_right">  356,966</td>
+<td headers="Number concepts" class="gt_row gt_right">    49</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-rheumatoid_arthritis-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-snf-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-snf-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,680</td>
+<td headers="Number records" class="gt_row gt_right">  354,680</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-snf-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-surgery-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-surgery-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,679</td>
+<td headers="Number records" class="gt_row gt_right">  354,775</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-surgery-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-total_joint_replacement-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-total_joint_replacement-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,682</td>
+<td headers="Number records" class="gt_row gt_right">  354,858</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-total_joint_replacement-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-veteran_prostate_cancer-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-veteran_prostate_cancer-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,718</td>
+<td headers="Number records" class="gt_row gt_right">  356,324</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-veteran_prostate_cancer-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-veterans-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-veterans-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,678</td>
+<td headers="Number records" class="gt_row gt_right">  354,791</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-veterans-10k.zip">🔗</a></span></td></tr>
+    <tr><td headers="datasetName" class="gt_row gt_left">synthea-weight_loss-10k</td>
+<td headers="CDM name" class="gt_row gt_left">synthea-weight_loss-10k</td>
+<td headers="CDM version" class="gt_row gt_right">5.3</td>
+<td headers="Size" class="gt_row gt_left">801. MB</td>
+<td headers="Number individuals" class="gt_row gt_right"> 10,677</td>
+<td headers="Number records" class="gt_row gt_right">  354,689</td>
+<td headers="Number concepts" class="gt_row gt_right">    46</td>
+<td headers="Link" class="gt_row gt_left"><span class="gt_from_md"><a href="https://example-data.ohdsi.dev/synthea-weight_loss-10k.zip">🔗</a></span></td></tr>
+  </tbody>
+  
+</table>
+</div>
+<p>For more details on those synthetic datasets you can check the <a href="https://ohdsi.github.io/OmopSketch/">OmopSketch</a> ShinyApp: <a href="https://dpa-pde-oxford.shinyapps.io/OmopSketchCharacterisation/" class="uri">https://dpa-pde-oxford.shinyapps.io/OmopSketchCharacterisation/</a>
+that characterise those datasets.</p>
+<p>You can also check programatically which are the synthetic datasets
+that you can use with:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">availableMockDatasets</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;GiBleed&quot;                             &quot;empty_cdm&quot;                          </span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt;  [3] &quot;synpuf-1k_5.3&quot;                       &quot;synpuf-1k_5.4&quot;                      </span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt;  [5] &quot;synthea-allergies-10k&quot;               &quot;synthea-anemia-10k&quot;                 </span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;synthea-breast_cancer-10k&quot;           &quot;synthea-contraceptives-10k&quot;         </span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;  [9] &quot;synthea-covid19-10k&quot;                 &quot;synthea-covid19-200k&quot;               </span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; [11] &quot;synthea-dermatitis-10k&quot;              &quot;synthea-heart-10k&quot;                  </span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; [13] &quot;synthea-hiv-10k&quot;                     &quot;synthea-lung_cancer-10k&quot;            </span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; [15] &quot;synthea-medications-10k&quot;             &quot;synthea-metabolic_syndrome-10k&quot;     </span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [17] &quot;synthea-opioid_addiction-10k&quot;        &quot;synthea-rheumatoid_arthritis-10k&quot;   </span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; [19] &quot;synthea-snf-10k&quot;                     &quot;synthea-surgery-10k&quot;                </span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; [21] &quot;synthea-total_joint_replacement-10k&quot; &quot;synthea-veteran_prostate_cancer-10k&quot;</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; [23] &quot;synthea-veterans-10k&quot;                &quot;synthea-weight_loss-10k&quot;</span></span></code></pre></div>
+</div>
+<div id="download-a-dataset" class="section level2">
+<h2>Download a dataset</h2>
+<p>To prevent having to download the dataset everytime that you want to
+use a dataset, it is recommended to set up a permanent folder where the
+synthetic datasets are stored. This allows the user to have to download
+each dataset only once. To set up a permanent location for your dataset
+please create an environmental variable
+(<code>usethis::edit_r_environ()</code>) pointing to an existing folder
+like:</p>
+<pre><code>OMOP_DATA_FOLDER=&quot;path/to/my/folder&quot;</code></pre>
+<p>This folder is in fact defined by <a href="https://darwin-eu.github.io/omopgenerics/">omopgenerics</a> and it
+is used also by other packages. You can check the folder by using the
+following function:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">omopDataFolder</span>()</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:\\Users\\miked\\AppData\\Local\\Temp\\Rtmp4uGcBF/OMOP_DATA_FOLDER&quot;</span></span></code></pre></div>
+<p>Note that if you would have set up an environment variable the
+message of temporary folder would not appear and you would see the path
+to you folder.</p>
+<p>You can download a dataset using
+<code>downloadMockDataset()</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">downloadMockDataset</span>(<span class="at">datasetName =</span> <span class="st">&quot;GiBleed&quot;</span>)</span></code></pre></div>
+<p>This will download the dataset and store it as a zip file in you
+<code>OMOP_DATA_FOLDER</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">list.files</span>(<span class="at">path =</span> <span class="fu">omopDataFolder</span>(), <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;mockDatasets/GiBleed.zip&quot;</span></span></code></pre></div>
+<p>Note datasets are stored in a subfolder named <em>mockDatasets</em>
+to account for the fact that this folder is used also by other packages
+to store data.</p>
+</div>
+<div id="create-a-cdm-reference-of-a-mock-dataset" class="section level2">
+<h2>Create a cdm reference of a mock dataset</h2>
+<p>You can easily create a mock dataset reference using the
+<code>mockCdmFromDataset()</code> function:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">mockCdmFromDataset</span>(<span class="at">datasetName =</span> <span class="st">&quot;GiBleed&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; ℹ Reading GiBleed tables.</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; ℹ Adding drug_strength table.</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; ℹ Creating local &lt;cdm_reference&gt; object.</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>cdm</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; ── # OMOP CDM reference (local) of GiBleed ─────────────────────────────────────</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; • omop tables: care_site, cdm_source, concept, concept_ancestor, concept_class,</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; concept_relationship, concept_synonym, condition_era, condition_occurrence,</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; cost, death, device_exposure, domain, dose_era, drug_era, drug_exposure,</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; drug_strength, fact_relationship, location, measurement, metadata, note,</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; note_nlp, observation, observation_period, payer_plan_period, person,</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; procedure_occurrence, provider, relationship, source_to_concept_map, specimen,</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; visit_detail, visit_occurrence, vocabulary</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; • cohort tables: -</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; • achilles tables: -</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; • other tables: -</span></span></code></pre></div>
+<p>Downloading the dataset before hand was not needed and that if you
+try to create a reference of a dataset that is not downloaded it will be
+downloaded in the process (in interactive sessions you will be
+asked):</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">mockCdmFromDataset</span>(<span class="at">datasetName =</span> <span class="st">&quot;GiBleed&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; ℹ Reading GiBleed tables.</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; ℹ Adding drug_strength table.</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; ℹ Creating local &lt;cdm_reference&gt; object.</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>cdm</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; ── # OMOP CDM reference (local) of GiBleed ─────────────────────────────────────</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; • omop tables: care_site, cdm_source, concept, concept_ancestor, concept_class,</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; concept_relationship, concept_synonym, condition_era, condition_occurrence,</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; cost, death, device_exposure, domain, dose_era, drug_era, drug_exposure,</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; drug_strength, fact_relationship, location, measurement, metadata, note,</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; note_nlp, observation, observation_period, payer_plan_period, person,</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; procedure_occurrence, provider, relationship, source_to_concept_map, specimen,</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; visit_detail, visit_occurrence, vocabulary</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt; • cohort tables: -</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt; • achilles tables: -</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt; • other tables: -</span></span></code></pre></div>
+<p>Finally, you can also insert the local dataset into a duckdb
+connection using the <code>source</code> argument:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>cdm <span class="ot">&lt;-</span> <span class="fu">mockCdmFromDataset</span>(<span class="at">datasetName =</span> <span class="st">&quot;GiBleed&quot;</span>, <span class="at">source =</span> <span class="st">&quot;duckdb&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt; ℹ Reading GiBleed tables.</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; ℹ Adding drug_strength table.</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt; ℹ Creating local &lt;cdm_reference&gt; object.</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; ℹ Inserting &lt;cdm_reference&gt; into duckdb.</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>cdm</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt; ── # OMOP CDM reference (duckdb) of GiBleed ────────────────────────────────────</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#&gt; • omop tables: care_site, cdm_source, concept, concept_ancestor, concept_class,</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt; concept_relationship, concept_synonym, condition_era, condition_occurrence,</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt; cost, death, device_exposure, domain, dose_era, drug_era, drug_exposure,</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; drug_strength, fact_relationship, location, measurement, metadata, note,</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; note_nlp, observation, observation_period, payer_plan_period, person,</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt; procedure_occurrence, provider, relationship, source_to_concept_map, specimen,</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt; visit_detail, visit_occurrence, vocabulary</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="co">#&gt; • cohort tables: -</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#&gt; • achilles tables: -</span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="co">#&gt; • other tables: -</span></span></code></pre></div>
+<p>Note the local datasets can be inserted in many different sources
+using the function <code>insertCdmTo()</code> from omopgenerics.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -20,7 +20,11 @@
 #' names(cdm)
 mockVocabularySet <- function(cdm = mockCdmReference(),
                               vocabularySet = "GiBleed") {
-
+  # read off mock
+  if (vocabularySet == "mock") {
+    cdm <- cdm |> mockVocabularyTables(vocabularySet = vocabularySet)
+    return(cdm)
+  }
   # initial check
   datasetName <- validateDatasetName(vocabularySet)
   cn <- omock::mockDatasets$cdm_name[omock::mockDatasets$dataset_name == datasetName]
@@ -66,29 +70,29 @@ mockVocabularySet <- function(cdm = mockCdmReference(),
   # fill tables
   for (nam in names(cdmTables)) {
     if (is.null(cdmTables[[nam]])) {
-      tableName <- paste0(vocabularySet,
-                          substr(toupper(nam), 1, 1),
-                          substr(nam, 2, nchar(nam)))
+      tableName <- paste0(
+        vocabularySet,
+        substr(toupper(nam), 1, 1),
+        substr(nam, 2, nchar(nam))
+      )
 
 
       cdmTables[[nam]] <- eval(parse(text = tableName)) |>
-        addOtherColumns(tableName = snakecase::to_snake_case(nam)) |>
-        correctCdmFormat(tableName = snakecase::to_snake_case(nam))
+        addOtherColumns(tableName = omopgenerics::toSnakeCase(nam)) |>
+        correctCdmFormat(tableName = omopgenerics::toSnakeCase(nam))
     }
   }
 
-  names(cdmTables) <- snakecase::to_snake_case(names(cdmTables))
-
-  cdm <- mockCdmReference()
+  names(cdmTables) <- omopgenerics::toSnakeCase(names(cdmTables))
 
   for (nam in names(cdmTables)) {
     cdm <-
-      omopgenerics::insertTable(cdm = cdm,
-                                name = nam,
-                                table = cdmTables[[nam]])
+      omopgenerics::insertTable(
+        cdm = cdm,
+        name = nam,
+        table = cdmTables[[nam]]
+      )
   }
 
   return(cdm)
-
 }
-
