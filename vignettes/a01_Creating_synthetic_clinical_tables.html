@@ -12,7 +12,7 @@
 
 
 
-<title>Creating mock clinical tables</title>
+<title>Creating synthetic clinical tables</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -336,7 +336,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Creating mock clinical tables</h1>
+<h1 class="title toc-ignore">Creating synthetic clinical tables</h1>
 
 
 
@@ -355,8 +355,8 @@ person and observation period table for 1000 people.</p>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>cdm</span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; ── # OMOP CDM reference (local) of synthetic cdm ───────────────────────────────</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; • omop tables: observation_period, person</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; ── # OMOP CDM reference (local) of synthetic cdm ─────────────────────────────────────────</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; • omop tables: person, observation_period</span></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; • cohort tables: -</span></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; • achilles tables: -</span></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; • other tables: -</span></span>
@@ -365,10 +365,10 @@ person and observation period table for 1000 people.</p>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; Rows: 1,000</span></span>
 <span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; Columns: 18</span></span>
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; $ person_id                   &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,…</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; $ gender_concept_id           &lt;int&gt; 8507, 8532, 8507, 8532, 8507, 8532, 8507, …</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; $ year_of_birth               &lt;int&gt; 1963, 1950, 1996, 2000, 1979, 1954, 1960, …</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; $ month_of_birth              &lt;int&gt; 9, 8, 6, 3, 7, 3, 7, 2, 2, 12, 3, 9, 8, 12…</span></span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; $ day_of_birth                &lt;int&gt; 7, 26, 14, 23, 1, 16, 5, 15, 26, 6, 7, 10,…</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; $ gender_concept_id           &lt;int&gt; 8532, 8507, 8532, 8507, 8507, 8507, 8532, …</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; $ year_of_birth               &lt;int&gt; 1964, 1988, 1993, 1992, 1959, 1967, 1981, …</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; $ month_of_birth              &lt;int&gt; 5, 7, 1, 1, 2, 1, 9, 9, 7, 12, 12, 7, 4, 1…</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; $ day_of_birth                &lt;int&gt; 24, 8, 20, 22, 28, 16, 7, 15, 10, 25, 5, 8…</span></span>
 <span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; $ race_concept_id             &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…</span></span>
 <span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; $ ethnicity_concept_id        &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…</span></span>
 <span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; $ birth_datetime              &lt;dttm&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</span></span>
@@ -386,11 +386,11 @@ person and observation period table for 1000 people.</p>
 <span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a>cdm<span class="sc">$</span>observation_period <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
 <span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a><span class="co">#&gt; Rows: 1,000</span></span>
 <span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a><span class="co">#&gt; Columns: 5</span></span>
-<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a><span class="co">#&gt; $ person_id                     &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1…</span></span>
-<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="co">#&gt; $ observation_period_start_date &lt;date&gt; 1998-09-17, 1985-04-26, 2014-03-07, 200…</span></span>
-<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a><span class="co">#&gt; $ observation_period_end_date   &lt;date&gt; 2007-12-26, 2015-02-01, 2018-05-20, 201…</span></span>
-<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a><span class="co">#&gt; $ observation_period_id         &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1…</span></span>
-<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a><span class="co">#&gt; $ period_type_concept_id        &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…</span></span></code></pre></div>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a><span class="co">#&gt; $ observation_period_id         &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1…</span></span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="co">#&gt; $ person_id                     &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1…</span></span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a><span class="co">#&gt; $ observation_period_start_date &lt;date&gt; 1984-07-16, 2012-02-22, 1998-07-13, 200…</span></span>
+<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a><span class="co">#&gt; $ observation_period_end_date   &lt;date&gt; 1987-02-07, 2017-06-19, 2008-08-28, 200…</span></span>
+<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a><span class="co">#&gt; $ period_type_concept_id        &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</span></span></code></pre></div>
 <p>We can add further requirements around the population we create. For
 example we can require that they were born between 1960 and 1980 like
 so.</p>
@@ -408,7 +408,7 @@ so.</p>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Year of birth&quot;</span>)</span></code></pre></div>
-<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
 
 
 
