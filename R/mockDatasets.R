@@ -1,8 +1,10 @@
 #' Create a `local` cdm_reference from a dataset.
 #'
-#' @param datasetName Name of the mock dataset. See `availableMockDatasets()`
-#' for possibilities.
+#' @template param-dataset-name
 #' @param source Choice between `local` or `duckdb`.
+#' @param cdmVersion Version of the OMOP CDM, can either be '5.3' or '5.4'. By
+#' default, the dataset's original CDM version is used. If a different version
+#' is requested, the returned CDM is converted with `changeCdmVersion()`.
 #'
 #' @return A local cdm_reference object.
 #' @export
@@ -16,38 +18,39 @@
 #' cdm
 #'
 mockCdmFromDataset <- function(datasetName = "GiBleed",
-                               source = "local") {
+                               source = "local",
+                               cdmVersion = NULL) {
   # initial check
-  datasetName <- validateDatasetName(datasetName)
+  omopgenerics::assertCharacter(datasetName, length = 1)
+  omopgenerics::assertChoice(cdmVersion, c("5.3", "5.4"), null = TRUE)
   omopgenerics::assertChoice(source, c("local", "duckdb"))
+
+  datasetName <- prepareDatasetName(datasetName, cdmVersion)
   cn <- omock::mockDatasets$cdm_name[omock::mockDatasets$dataset_name == datasetName]
   cv <- omock::mockDatasets$cdm_version[omock::mockDatasets$dataset_name == datasetName]
-
-
-
+  cdmVersion <- rlang::`%||%`(cdmVersion, cv)
 
   if (datasetName == "GiBleed") {
     cli::cli_inform(c(i = "Loading bundled {.pkg {datasetName}} tables from package data."))
     tables <- gibleed
   } else {
-  # make dataset available
-  datasetPath <- datasetAvailable(datasetName)
+    # make dataset available
+    datasetPath <- datasetAvailable(datasetName)
 
-  # folder to unzip
-  tmpFolder <- file.path(tempdir(), omopgenerics::uniqueId())
-  if (dir.exists(tmpFolder)) {
+    # folder to unzip
+    tmpFolder <- file.path(tempdir(), omopgenerics::uniqueId())
+    if (dir.exists(tmpFolder)) {
+      unlink(x = tmpFolder, recursive = TRUE)
+    }
+    dir.create(tmpFolder)
+
+    # unzip
+    utils::unzip(zipfile = datasetPath, exdir = tmpFolder)
+    cli::cli_inform(c(i = "Reading {.pkg {datasetName}} tables."))
+    tables <- readTables(tmpFolder, cv)
+
+    # delete csv files
     unlink(x = tmpFolder, recursive = TRUE)
-  }
-  dir.create(tmpFolder)
-
-  # unzip
-  utils::unzip(zipfile = datasetPath, exdir = tmpFolder)
-  cli::cli_inform(c(i = "Reading {.pkg {datasetName}} tables."))
-  tables <- readTables(tmpFolder, cv)
-
-  # delete csv files
-  unlink(x = tmpFolder, recursive = TRUE)
-
   }
 
   # add drug strength
@@ -60,6 +63,11 @@ mockCdmFromDataset <- function(datasetName = "GiBleed",
 
   cli::cli_inform(c(i = "Creating local {.cls cdm_reference} object."))
   cdm <- omopgenerics::cdmFromTables(tables = tables, cdmName = cn, cdmVersion = cv)
+
+  if (cv != cdmVersion) {
+    cli::cli_inform(c(i = "Adapting cdmVersion from {.pkg {cv}} to {.pkg {cdmVersion}}."))
+    cdm <- changeCdmVersion(cdm = cdm, cdmVersion = cdmVersion)
+  }
 
   if (identical(source, "duckdb")) {
     cli::cli_inform(c(i = "Inserting {.cls cdm_reference} into {.pkg duckdb}."))
@@ -83,6 +91,27 @@ mockCdmFromDataset <- function(datasetName = "GiBleed",
 
   return(cdm)
 }
+prepareDatasetName <- function(datasetName, cdmVersion) {
+  datasetName <- validateDatasetName(datasetName)
+  if (datasetName %in% omock::mockDatasets$dataset_name) {
+    return(datasetName)
+  }
+
+  cdmVersion <- rlang::`%||%`(cdmVersion, "5.4")
+  availableDatasets <- omock::mockDatasets |>
+    dplyr::filter(.data$cdm_name == .env$datasetName)
+
+  requestedDataset <- availableDatasets |>
+    dplyr::filter(.data$cdm_version == .env$cdmVersion)
+  if (nrow(requestedDataset) > 0) {
+    return(requestedDataset$dataset_name[[1]])
+  }
+
+  availableDatasets |>
+    dplyr::arrange(dplyr::desc(.data$cdm_version)) |>
+    dplyr::pull("dataset_name") |>
+    dplyr::first()
+}
 readTables <- function(tmpFolder, cv, vocab = F) {
   tables <- list.files(tmpFolder, full.names = TRUE, pattern = "\\.parquet$", recursive = TRUE)
 
@@ -102,7 +131,7 @@ readTables <- function(tmpFolder, cv, vocab = F) {
   tables
 }
 getDrugStrength <- function() {
-  drugStregthFile <- file.path(mockDatasetsFolder(), "drug_strength.rds")
+  drugStregthFile <- file.path(mockFolder(), "drug_strength.rds")
 
   # download if it does not exist
   if (!file.exists(drugStregthFile)) {
@@ -172,8 +201,7 @@ getDrugStrength <- function() {
 
 #' Download an OMOP Synthetic dataset.
 #'
-#' @param datasetName Name of the mock dataset. See `availableMockDatasets()`
-#' for possibilities.
+#' @template param-dataset-name
 #' @param path Path where to download the dataset.
 #' @param overwrite Whether to overwrite the dataset if it is already
 #' downloaded. If NULL the used is asked whether to overwrite.
@@ -194,7 +222,7 @@ downloadMockDataset <- function(datasetName = "GiBleed",
                                 path = NULL,
                                 overwrite = NULL) {
   # initial checks
-  datasetName <- validateDatasetName(datasetName)
+  datasetName <- prepareDatasetName(datasetName, cdmVersion = NULL)
   if (is.null(path)) {
     path <- mockFolder()
   }
@@ -282,8 +310,7 @@ downloadMockDataset <- function(datasetName = "GiBleed",
 
 #' Check if a certain dataset is downloaded.
 #'
-#' @param datasetName Name of the mock dataset. See `availableMockDatasets()`
-#' for possibilities.
+#' @template param-dataset-name
 #'
 #' @return Whether the dataset is available or not.
 #' @export
@@ -299,7 +326,7 @@ downloadMockDataset <- function(datasetName = "GiBleed",
 #'
 isMockDatasetDownloaded <- function(datasetName = "GiBleed") {
   # initial checks
-  datasetName <- validateDatasetName(datasetName)
+  datasetName <- prepareDatasetName(datasetName, cdmVersion = NULL)
 
   filePath <- file.path(mockFolder(), paste0(datasetName, ".zip"))
   result <- file.exists(filePath)
@@ -308,15 +335,16 @@ isMockDatasetDownloaded <- function(datasetName = "GiBleed") {
   if (isTRUE(result)) {
     expectedSize <- omock::mockDatasets$size[omock::mockDatasets$dataset_name == datasetName]
     actualSize <- file.size(filePath)
-    if (actualSize != expectedSize) {
-      cli::cli_warn(c("!" = "There is a downloaded dataset in {.path {filePath}}
-                      but its size ({actualSize} B) is not the expected {expectedSize} B."))
-      if (question("Do you want to delete prior dataset? Y/n")) {
+    if (!isDatasetSizeOk(actualSize = actualSize, expectedSize = expectedSize)) {
+      cli::cli_warn(c(
+        "!" = "The downloaded dataset in {.path {filePath}} appears incomplete.",
+        "i" = "Its size is {actualSize} B, but the expected size is {expectedSize} B."
+      ))
+      if (question("Delete the incomplete dataset and download it again? Y/n")) {
         file.remove(filePath)
         cli::cli_inform(c(
           "v" = "Incomplete prior dataset deleted.",
-          "i" = "Probably connection was trucaded due to small timeout, do you
-          want to set a bigger timeout? {.run options(timeout = 1200)}"
+          "i" = "If this was caused by a timeout, try increasing it with {.run options(timeout = 1200)}."
         ))
         result <- FALSE
       }
@@ -324,6 +352,13 @@ isMockDatasetDownloaded <- function(datasetName = "GiBleed") {
   }
 
   return(result)
+}
+isDatasetSizeOk <- function(actualSize, expectedSize, tolerance = 0.0001) {
+  if (length(actualSize) != 1 || length(expectedSize) != 1 ||
+      is.na(actualSize) || is.na(expectedSize)) {
+    return(FALSE)
+  }
+  actualSize >= expectedSize * (1 - tolerance)
 }
 
 #' List the available datasets
@@ -337,7 +372,7 @@ isMockDatasetDownloaded <- function(datasetName = "GiBleed") {
 #' availableMockDatasets()
 #'
 availableMockDatasets <- function() {
-  omock::mockDatasets$dataset_name
+  sort(unique(c(omock::mockDatasets$dataset_name, omock::mockDatasets$cdm_name)))
 }
 
 #' Check the availability of the OMOP CDM datasets.
@@ -417,6 +452,7 @@ mockFolder <- function(path = NULL) {
   return(datasetsPath)
 }
 datasetAvailable <- function(datasetName, call = parent.frame()) {
+  datasetName <- prepareDatasetName(datasetName, cdmVersion = NULL)
   if (!isMockDatasetDownloaded(datasetName = datasetName)) {
     if (question(paste0("`", datasetName, "` is not downloaded, do you want to download it? Y/n"))) {
       downloadMockDataset(datasetName = datasetName)

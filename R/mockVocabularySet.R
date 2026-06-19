@@ -1,12 +1,19 @@
 #' Creates an empty mock CDM database populated with various vocabulary tables set.
 #'
 #' This function create specified vocabulary tables to a CDM object. It can either populate the tables with provided data frames or initialize empty tables if no data is provided. This is useful for setting up a testing environment with controlled vocabulary data.
-#' @param cdm A `cdm_reference` object that serves as the base structure for adding vocabulary tables.
-#'            This should be an existing or a newly created CDM object, typically initialized without any vocabulary tables.
+#' @template param-cdm
 #'
 #' @param vocabularySet A character string that specifies a prefix or a set name used to initialize mock data tables.
 #'                      This allows for customization of the source data or structure names when generating vocabulary tables.
-#' @return Returns the modified `cdm` object with the provided vocabulary set tables.
+#' @param conceptSet An optional numeric vector of concept IDs used to subset
+#'                   the loaded vocabulary tables.
+#' @param includeRelated Whether to retain vocabulary concepts directly related
+#'                       to `conceptSet`. Defaults to `TRUE`. If `FALSE`, only
+#'                       the requested concept IDs are kept.
+#' @param keepDomains Character vector of `domain_id` values to always retain
+#'                    when subsetting vocabulary tables. Defaults to
+#'                    `c("Unit", "Visit", "Gender")`.
+#' @template return-cdm
 #'
 #' @export
 #'
@@ -19,10 +26,18 @@
 #' # View the names of the tables added to the CDM
 #' names(cdm)
 mockVocabularySet <- function(cdm = mockCdmReference(),
-                              vocabularySet = "GiBleed") {
+                              vocabularySet = "GiBleed",
+                              conceptSet = NULL,
+                              includeRelated = TRUE,
+                              keepDomains = c("Unit", "Visit", "Gender")) {
   # read off mock
   if (vocabularySet == "mock") {
-    cdm <- cdm |> mockVocabularyTables(vocabularySet = vocabularySet)
+    cdm <- cdm |> mockVocabularyTables(
+      vocabularySet = vocabularySet,
+      conceptSet = conceptSet,
+      includeRelated = includeRelated,
+      keepDomains = keepDomains
+    )
     return(cdm)
   }
   # initial check
@@ -82,6 +97,13 @@ mockVocabularySet <- function(cdm = mockCdmReference(),
         correctCdmFormat(tableName = omopgenerics::toSnakeCase(nam))
     }
   }
+
+  cdmTables <- subsetVocabularyTables(
+    cdmTables = cdmTables,
+    conceptSet = conceptSet,
+    includeRelated = includeRelated,
+    keepDomains = keepDomains
+  )
 
   names(cdmTables) <- omopgenerics::toSnakeCase(names(cdmTables))
 

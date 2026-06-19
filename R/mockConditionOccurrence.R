@@ -7,30 +7,17 @@
 #' periods to ensure that all conditions are recorded within valid observation
 #' windows.
 #'
-#' @param cdm A `cdm_reference` object that should already include 'person',
-#'           'observation_period', and 'concept' tables.This object is the base
-#'           CDM structure where the condition occurrence data will be added.
-#'            It is essential that these tables are not empty as they provide
-#'            the necessary context for generating condition data.
+#' @template param-cdm
 #'
-#' @param recordPerson An integer specifying the expected number of condition
-#'                     records to generate per person.This parameter allows
-#'                     the simulation of varying frequencies of condition
-#'                     occurrences among individuals in the cohort,
-#'                     reflecting the variability seen in real-world medical
-#'                     data.
+#' @param recordPerson Numeric multiplier used to determine how many condition
+#'                     occurrence records to generate relative to the number of
+#'                     people in `cdm$person`. The function creates
+#'                     `round(recordPerson * nrow(cdm$person))` rows, then
+#'                     samples people with replacement to assign those records.
 #'
-#' @param seed An optional integer used to set the seed for random number
-#'             generation, ensuring reproducibility of the generated data.If
-#'             provided, it allows the function to produce the same results
-#'             each time it is run with the same inputs.If 'NULL', the seed is
-#'             not set, resulting in different outputs on each run.
+#' @template param-seed
 #'
-#' @return Returns the modified `cdm` object with the new
-#'         'condition_occurrence' table added. This table includes the
-#'         simulated condition data for each person, ensuring that each
-#'         record is within the valid observation periods and linked to the
-#'         correct individuals in the 'person' table.
+#' @template return-cdm
 #'
 #' @export
 #'
@@ -74,30 +61,25 @@ mockConditionOccurrence <- function(cdm,
   concept_id <- getConceptId(cdm = cdm, type = "Condition")
   type_id <- getConceptId(cdm = cdm, type = "Condition Type")
 
-  # number of rows per concept_id
-  numberRows <- round(recordPerson * (nrow(cdm$person)))
+  numberRows <- round(recordPerson * nrow(cdm$person))
 
-  con <- list()
-
-  for (i in seq_along(concept_id)) {
-    num <- numberRows
-    con[[i]] <- dplyr::tibble(
-      condition_concept_id = concept_id[i],
-      subject_id = sample(
-        x = cdm$person |> dplyr::pull("person_id"),
-        size = num,
-        replace = TRUE
-      )
+  con <- dplyr::tibble(
+    condition_concept_id = if (length(concept_id) > 1) {
+      sample(concept_id, size = numberRows, replace = TRUE)
+    } else {
+      rep(concept_id, numberRows)
+    },
+    subject_id = sample(
+      x = cdm$person |> dplyr::pull("person_id"),
+      size = numberRows,
+      replace = TRUE
+    )
+  ) |>
+    addCohortDates(
+      start = "condition_start_date",
+      end = "condition_end_date",
+      observationPeriod = cdm$observation_period
     ) |>
-      addCohortDates(
-        start = "condition_start_date",
-        end = "condition_end_date",
-        observationPeriod = cdm$observation_period
-      )
-  }
-
-  con <- con |>
-    dplyr::bind_rows() |>
     dplyr::mutate(
       condition_occurrence_id = dplyr::row_number(),
       condition_type_concept_id = if (length(type_id) > 1) {

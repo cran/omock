@@ -5,9 +5,7 @@
 #' specified properties and simulates the frequency of observations for
 #' individuals.
 #'
-#' @param cdm A CDM reference object where the synthetic cohort data will be
-#' stored. This object should already include necessary tables such as `person`
-#' and `observation_period`.
+#' @template param-cdm
 #' @param name A string specifying the name of the table within the CDM where
 #' the cohort data will be stored. Defaults to "cohort". This name will be used
 #' to reference the new table in the CDM.
@@ -25,13 +23,9 @@
 #' length must match the value of `numberCohorts`. This parameter helps
 #' simulate the frequency of observations for individuals in each cohort,
 #' allowing for realistic variability in data.
-#' @param seed An integer specifying the random seed for reproducibility of the
-#' generated data. Setting a seed ensures that the same synthetic data can be
-#' generated again, facilitating consistent results across different runs.
+#' @template param-seed
 #'
-#' @return A CDM reference object with the mock cohort tables added. The new
-#' table will contain synthetic data representing the specified cohorts, each
-#' with its own set of observation records.
+#' @template return-cdm
 #' @examples
 #' library(omock)
 #' cdm <- mockCdmReference() |>
@@ -173,13 +167,35 @@ mockCohort <- function(cdm,
     cohort_definition_id = cohortId,
     cohort_name = cohortName
   )
+
+  cohortAttritionTable <- cohortSetTable |>
+    dplyr::select("cohort_definition_id") |>
+    dplyr::left_join(
+      cohort |>
+        dplyr::group_by(.data$cohort_definition_id) |>
+        dplyr::summarise(
+          number_records = dplyr::n(),
+          number_subjects = dplyr::n_distinct(.data$subject_id),
+          .groups = "drop"
+        ),
+      by = "cohort_definition_id"
+    ) |>
+    dplyr::mutate(
+      number_records = dplyr::coalesce(.data$number_records, 0L),
+      number_subjects = dplyr::coalesce(.data$number_subjects, 0L),
+      reason_id = 1L,
+      reason = "Initial qualifying events",
+      excluded_records = 0L,
+      excluded_subjects = 0L
+    )
+
   # create class
 
   cdm <- omopgenerics::insertTable(cdm = cdm, name = name, table = cohort)
   cdm[[name]] <- cdm[[name]] |>
     omopgenerics::newCohortTable(
       cohortSetRef = cohortSetTable,
-      cohortAttritionRef = attr(cohort, "cohort_attrition")
+      cohortAttritionRef = cohortAttritionTable
     )
 
   return(cdm)

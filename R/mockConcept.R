@@ -1,17 +1,14 @@
 #' Adds mock concept data to a concept table within a Common Data Model (CDM) object.
 #'
-#' `r lifecycle::badge('experimental')`
+#' `r lifecycle::badge('deprecated')`
 #'
-#' This function inserts new concept entries into a specified domain within
-#' the concept table of a CDM object.It supports four domains: Condition, Drug,
-#' Measurement, and Observation. Existing entries with the same concept IDs
-#' will be overwritten, so caution should be used when adding data to prevent
-#' unintended data loss.
+#' `mockConcepts()` is deprecated because it creates placeholder concept rows
+#' that may be mistaken for real OMOP vocabulary content. Prefer using
+#' `mockCdmReference()` with `vocabularySet = "eunomia"`,
+#' `mockVocabularyTables()`, or `subsetVocabularyTables()`.
 #'
 #'
-#' @param cdm A CDM object that represents a common data model containing at
-#'            least a concept table.This object will be modified in-place to
-#'            include the new or updated concept entries.
+#' @template param-cdm
 #'
 #' @param conceptSet A numeric vector of concept IDs to be added or updated in
 #'                   the concept table.These IDs should be unique within the
@@ -23,14 +20,9 @@
 #'               "Observation". This defines under which category the concepts
 #'               fall and affects which vocabulary is used for them.
 #'
-#' @param seed An optional integer value used to set the random seed for
-#'            generating reproducible concept attributes like `vocabulary_id`
-#'            and `concept_class_id`. Useful for testing or when consistent
-#'            output is required.
+#' @template param-seed
 #'
-#' @return Returns the modified CDM object with the updated concept table
-#'         reflecting the newly added concepts.The function directly modifies
-#'         the provided CDM object.
+#' @template return-cdm
 #' @export
 #'
 #' @examples
@@ -49,6 +41,17 @@ mockConcepts <- function(cdm,
                          conceptSet,
                          domain = "Condition",
                          seed = NULL) {
+  lifecycle::deprecate_warn(
+    when = "0.6.2.9000",
+    what = "mockConcepts()",
+    details = paste(
+      "`mockConcepts()` creates placeholder concept rows that may be mistaken",
+      "for real OMOP vocabulary content. Use `mockCdmReference()` with",
+      "`vocabularySet = \"eunomia\"`, `mockVocabularyTables()`, or",
+      "`subsetVocabularyTables()` instead."
+    )
+  )
+
   # initial checks
   checkInput(
     cdm = cdm,
@@ -61,6 +64,8 @@ mockConcepts <- function(cdm,
     set.seed(seed = seed)
   }
 
+  conceptSet <- as.integer(conceptSet)
+
 
   if (!domain %in% c("Condition", "Drug", "Measurement", "Observation")) {
     cli::cli_abort("This function only supports concept in the Condtion,
@@ -72,7 +77,7 @@ mockConcepts <- function(cdm,
   }
 
   countConcept <- cdm$concept |>
-    dplyr::filter("concept_id" %in% conceptSet) |>
+    dplyr::filter(.data$concept_id %in% .env$conceptSet) |>
     dplyr::tally() |>
     dplyr::pull()
 
@@ -81,7 +86,8 @@ mockConcepts <- function(cdm,
                   table. This will overwrite the existing entry.")
   }
 
-  cdm$concept <- cdm$concept |> dplyr::filter(!"concept_id" %in% conceptSet)
+  cdm$concept <- cdm$concept |>
+    dplyr::filter(!.data$concept_id %in% .env$conceptSet)
 
   # generate vocabulary_id
 

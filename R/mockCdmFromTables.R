@@ -5,8 +5,7 @@
 #' periods and that all individual records are consistent with the entries in the person table. This is useful for
 #' creating reliable and realistic healthcare data simulations for development and testing within the OMOP CDM framework.
 #'
-#' @param cdm A `cdm_reference` object, which serves as the base structure where all additional tables will be integrated.
-#'            This parameter should already be initialized and can contain pre-existing standard or cohort-specific OMOP tables.
+#' @template param-cdm
 #'
 #' @param tables A named list of data frames representing additional tables to be integrated into the CDM.
 #'               These tables can include both standard OMOP tables such as 'drug_exposure' or 'condition_occurrence',
@@ -17,12 +16,9 @@
 #'        This value ensures that `observation_period_end_date` values do not exceed the current calendar date.
 #'
 #'
-#' @param seed An optional integer that sets the seed for random number generation used in creating mock data entries.
-#'             Setting a seed ensures that the generated mock data are reproducible across different runs of the function.
-#'             If 'NULL', the seed is not set, leading to non-deterministic behavior in data generation.
+#' @template param-seed
 #'
-#' @return Returns the updated `cdm` object with all the new tables added and integrated, ensuring consistency
-#'         across the observational periods and the person entries.
+#' @template return-cdm
 #'
 #' @export
 #'
@@ -93,10 +89,12 @@ mockCdmFromTables <- function(cdm = mockCdmReference(),
   # append cdm tables to tables
   tables <- mergeTables(tables, cdm)
 
+  validateObservationDates(tables)
+
   # summarise individuals observation
   individuals <- summariseObservations(tables)
 
-  if (max(individuals$last_observation) > maxObservationalPeriodEndDate) {
+  if (max(individuals$last_observation, na.rm = TRUE) > maxObservationalPeriodEndDate) {
     cli::cli_abort(
       "tables provided contain date greater than `maxObservationalPeriodEndDate`",
       call = parent.frame()
@@ -259,6 +257,48 @@ getEndDate <- function(tableName) {
   }
   return(x)
 }
+validateObservationDates <- function(tables, call = parent.frame()) {
+  missingDates <- character()
+
+  for (k in seq_along(tables)) {
+    tableName <- names(tables)[k]
+
+    if (tableName == "person") {
+      next
+    }
+
+    personId <- getPersonId(tableName)
+
+    if (!is.na(personId)) {
+      dateColumns <- unique(c(getStartDate(tableName), getEndDate(tableName)))
+      dateColumns <- dateColumns[dateColumns %in% colnames(tables[[k]])]
+      colsWithMissingDates <- dateColumns[purrr::map_lgl(
+        dateColumns,
+        ~ any(is.na(tables[[k]][[.x]]))
+      )]
+
+      if (length(colsWithMissingDates) > 0) {
+        missingDates <- c(
+          missingDates,
+          paste0(tableName, "$", colsWithMissingDates)
+        )
+      }
+    }
+  }
+
+  if (length(missingDates) > 0) {
+    cli::cli_abort(
+      c(
+        "Input tables contain missing dates in columns used to derive observation periods.",
+        "i" = "Provide non-missing values for these date columns or remove the affected records.",
+        "x" = "{missingDates}"
+      ),
+      call = call
+    )
+  }
+
+  return(invisible(NULL))
+}
 summariseObservations <- function(tables) {
   individuals <- dplyr::tibble(
     "person_id" = integer(), "date" = as.Date(character())
@@ -320,8 +360,8 @@ summariseObservations <- function(tables) {
   individuals <- individuals |>
     dplyr::group_by(.data$person_id) |>
     dplyr::summarise(
-      "first_observation" = min(.data$date),
-      "last_observation" = max(.data$date)
+      "first_observation" = min(.data$date, na.rm = TRUE),
+      "last_observation" = max(.data$date, na.rm = TRUE)
     )
 
   return(individuals)

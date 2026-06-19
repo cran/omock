@@ -2,7 +2,7 @@ Type: Package
 Package: omock
 Title: Creation of Mock Observational Medical Outcomes Partnership
         Common Data Model
-Version: 0.6.2
+Version: 0.7.0
 Authors@R: c(
     person("Mike", "Du", , "mike.du@ndorms.ox.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9517-8834")),
@@ -25,7 +25,7 @@ License: Apache License (>= 2)
 URL: https://ohdsi.github.io/omock/, https://github.com/ohdsi/omock
 Depends: R (>= 4.1.0)
 Imports: arrow, cli, dplyr, lifecycle, clock, methods, omopgenerics (>=
-        1.3.1), purrr, readr, rlang, stats, utils
+        1.4.0), purrr, readr, rlang, stats, utils
 Suggests: CDMConnector, DBI, duckdb, ggplot2, gt, knitr,
         PatientProfiles, rmarkdown, stringr, testthat (>= 3.0.0)
 VignetteBuilder: knitr
@@ -35,7 +35,7 @@ RoxygenNote: 7.3.3
 BugReports: https://github.com/ohdsi/omock/issues
 LazyData: true
 NeedsCompilation: no
-Packaged: 2026-03-23 08:40:14 UTC; miked
+Packaged: 2026-06-19 05:54:54 UTC; miked
 Author: Mike Du [aut, cre] (ORCID: <https://orcid.org/0000-0002-9517-8834>),
   Martí Català [aut] (ORCID: <https://orcid.org/0000-0003-3308-9905>),
   Edward Burn [aut] (ORCID: <https://orcid.org/0000-0002-9286-1128>),
@@ -43,4 +43,4 @@ Author: Mike Du [aut, cre] (ORCID: <https://orcid.org/0000-0002-9517-8834>),
     <https://orcid.org/0009-0006-7948-3747>),
   Xihang Chen [aut] (ORCID: <https://orcid.org/0009-0001-8112-8959>)
 Repository: CRAN
-Date/Publication: 2026-03-23 09:00:02 UTC
+Date/Publication: 2026-06-19 06:50:02 UTC

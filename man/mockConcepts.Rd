@@ -7,9 +7,7 @@
 mockConcepts(cdm, conceptSet, domain = "Condition", seed = NULL)
 }
 \arguments{
-\item{cdm}{A CDM object that represents a common data model containing at
-least a concept table.This object will be modified in-place to
-include the new or updated concept entries.}
+\item{cdm}{A local \code{cdm_reference} object used as the base structure to update.}
 
 \item{conceptSet}{A numeric vector of concept IDs to be added or updated in
 the concept table.These IDs should be unique within the
@@ -21,25 +19,19 @@ added.Only accepts "Condition", "Drug", "Measurement", or
 "Observation". This defines under which category the concepts
 fall and affects which vocabulary is used for them.}
 
-\item{seed}{An optional integer value used to set the random seed for
-generating reproducible concept attributes like \code{vocabulary_id}
-and \code{concept_class_id}. Useful for testing or when consistent
-output is required.}
+\item{seed}{An optional integer used to set the random seed for reproducibility. If \code{NULL}, the seed is not set.}
 }
 \value{
-Returns the modified CDM object with the updated concept table
-reflecting the newly added concepts.The function directly modifies
-the provided CDM object.
+A modified \code{cdm_reference} object.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 }
 \details{
-This function inserts new concept entries into a specified domain within
-the concept table of a CDM object.It supports four domains: Condition, Drug,
-Measurement, and Observation. Existing entries with the same concept IDs
-will be overwritten, so caution should be used when adding data to prevent
-unintended data loss.
+\code{mockConcepts()} is deprecated because it creates placeholder concept rows
+that may be mistaken for real OMOP vocabulary content. Prefer using
+\code{mockCdmReference()} with \code{vocabularySet = "eunomia"},
+\code{mockVocabularyTables()}, or \code{subsetVocabularyTables()}.
 }
 \examples{
 library(omock)
